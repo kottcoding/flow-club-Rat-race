@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "../components/game-data.css";
+import "../components/flow-garden.css";
 
 export const metadata: Metadata = {
   title: "Flow Club | Play your way to freedom",
