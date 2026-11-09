@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 const base=process.env.TEST_URL||'http://127.0.0.1:8787';
 const tokens=Array.from({length:7},()=>crypto.randomUUID()+crypto.randomUUID());
-async function call(i,body,id){const r=await fetch(base+'/api/game'+(id?'?room='+id:''),{method:body?'POST':'GET',headers:{Authorization:'Bearer '+tokens[i],...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify({...body,clientVersion:2})}:{})});return {status:r.status,...await r.json()};}
+async function call(i,body,id){const r=await fetch(base+'/api/game'+(id?'?room='+id:''),{method:body?'POST':'GET',headers:{Authorization:'Bearer '+tokens[i],...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify({...body,clientVersion:3})}:{})});return {status:r.status,...await r.json()};}
 let d=await call(0,{type:'create',name:'Player 1',title:'API integration test'});assert.equal(d.status,200);const id=d.room.id;
 assert.equal(d.room.currency,'THB');
 assert.equal(d.room.schemaVersion,2);

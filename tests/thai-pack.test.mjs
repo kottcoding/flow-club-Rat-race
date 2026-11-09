@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {room,player,apply,totals,dreams,outer,roomDreams,roomBoard,dreamFor,normalizeRoom,drawCard,professions,small,big,publicRoom} from '../lib/game.mjs';
 import {engineer,doodads,markets} from '../lib/thai-pack.mjs';
-function lobby(){const p=player('A','key-a'),q=player('B','key-b');const g=room('TEST','Thai',p);g.players.push(q);return g;}
+// Regression coverage for rooms already using the 2026-11-08 sample pack.
+function lobby(){const p=player('A','key-a'),q=player('B','key-b');const g=room('TEST','Thai',p);g.ruleset='thai-photo-20261108-v1';g.players.push(q);return g;}
 function game(){const g=lobby();g.players.forEach(p=>p.ready=true);apply(g,g.host,{type:'start'},()=>0);return g;}
 test('23 photo Dreams have stable unique IDs, bilingual names, baht prices and one reachable space each',()=>{
  assert.equal(dreams.length,23);assert.equal(new Set(dreams.map(d=>d.id)).size,23);assert.equal(outer.length,48);
