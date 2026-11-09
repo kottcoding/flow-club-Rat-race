@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 700">
+ <defs>
+  <radialGradient id="sky"><stop stop-color="#5786df"/><stop offset=".65" stop-color="#3557a6"/><stop offset="1" stop-color="#232d65"/></radialGradient>
+  <linearGradient id="gold" x2="0" y2="1"><stop stop-color="#fff0a2"/><stop offset=".5" stop-color="#ffd66c"/><stop offset="1" stop-color="#d99b44"/></linearGradient>
+  <linearGradient id="pig" x2=".3" y2="1"><stop stop-color="#ffe2ee"/><stop offset="1" stop-color="#ed96ba"/></linearGradient>
+  <linearGradient id="mint" x2="0" y2="1"><stop stop-color="#b8f4dc"/><stop offset="1" stop-color="#55b7ad"/></linearGradient>
+  <linearGradient id="frame" x2="1" y2="1"><stop stop-color="#fff4c1"/><stop offset=".4" stop-color="#eabf72"/><stop offset=".7" stop-color="#fff5ce"/><stop offset="1" stop-color="#ba8b53"/></linearGradient>
+  <pattern id="stars" width="86" height="94" patternUnits="userSpaceOnUse"><circle cx="15" cy="24" r="1" fill="#e7eeff" opacity=".35"/><circle cx="68" cy="71" r="1.5" fill="#c7cfff" opacity=".25"/></pattern>
+  <g id="spark"><path d="M0-7Q1-1 7 0Q1 1 0 7Q-1 1-7 0Q-1-1 0-7" fill="#fff0b4"/></g>
+  <g id="coin"><rect x="-17" y="-5" width="34" height="10" rx="3" fill="#e3ac52"/><ellipse rx="17" ry="5" cy="-5" fill="#ffe49b"/><path d="M-11 1v3m7-3v3m7-3v3m7-3v3" stroke="#bd873d" stroke-width="1.5"/></g>
+ </defs>
+ <rect x="2" y="2" width="696" height="696" rx="33" fill="url(#frame)"/>
+ <rect x="7" y="7" width="686" height="686" rx="29" fill="url(#sky)" stroke="#fff6dc" stroke-width="1.5"/>
+ <rect x="15" y="15" width="670" height="670" rx="23" fill="none" stroke="#92b5ee" stroke-opacity=".55"/>
+ <rect x="83" y="83" width="534" height="534" rx="38" fill="url(#stars)"/>
+ <path d="M88 354C170 271 530 429 613 337M93 367C190 300 520 461 610 370" fill="none" stroke="#83e0e2" stroke-opacity=".15" stroke-width="2"/>
+ <circle cx="350" cy="350" r="224" fill="none" stroke="#c8dfff" stroke-opacity=".2"/>
+ <circle cx="350" cy="350" r="217" fill="none" stroke="#ffe3a4" stroke-width="2"/>
+ <!-- Friendly savings mascot, kept in the unused corner of the board. -->
+ <g transform="translate(150 165) rotate(-12)">
+  <ellipse cy="48" rx="52" ry="9" fill="#152358" opacity=".25"/>
+  <path d="M-33 22l-2 20q6 8 13 0l4-15M21 23l2 19q7 8 13-1l-2-22" fill="#dd85ae"/>
+  <path d="M-37-15l-2-27q18 0 25 19M10-23q11-22 24-17l-4 29" fill="url(#pig)" stroke="#f9c0d7" stroke-width="2"/>
+  <ellipse rx="49" ry="35" fill="url(#pig)"/>
+  <path d="M-52-2q-17-7-13 6q2 9 9 1" fill="none" stroke="#f2accb" stroke-width="5" stroke-linecap="round"/>
+  <ellipse cx="28" cy="10" rx="20" ry="14" fill="#ffcee0"/>
+  <ellipse cx="23" cy="9" rx="2.5" ry="4" fill="#c3769d"/><ellipse cx="35" cy="9" rx="2.5" ry="4" fill="#c3769d"/>
+  <circle cx="8" cy="-7" r="3.5" fill="#302d5d"/><circle cx="9" cy="-8" r="1" fill="white"/>
+  <ellipse cx="-1" cy="9" rx="7" ry="4" fill="#e887ae" opacity=".7"/>
+  <path d="M-18-24h24" stroke="#a76692" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="-5" cy="-48" r="17" fill="url(#gold)" stroke="#fff0b6" stroke-width="2"/>
+  <path d="M-5-59v22m5-17q-13-6-12 2q0 4 7 4q10 2 3 7q-5 3-11-1" stroke="#ad792f" stroke-width="2" fill="none" stroke-linecap="round"/>
+ </g>
+ <!-- Investment garden and growth chart. -->
+ <g transform="translate(520 135)">
+  <ellipse cx="22" cy="65" rx="59" ry="10" fill="#172758" opacity=".25"/>
+  <rect x="-17" y="29" width="17" height="35" rx="4" fill="#8ab4f0"/><rect x="9" y="11" width="17" height="53" rx="4" fill="#9adace"/><rect x="35" y="-9" width="17" height="73" rx="4" fill="#c6b7f5"/>
+  <path d="M-28 18L-6 0 11 4 46-29M29-29h17v17" fill="none" stroke="#ffda83" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(-29 55)"><use href="#coin"/><use href="#coin" y="-9"/><use href="#coin" y="-18"/><use href="#coin" y="-27"/>
+   <path d="M0-34v-27" stroke="#92d7ab" stroke-width="4"/><path d="M0-48q-28 0-24-22q23 1 24 22M0-54q-1-23 23-25q5 21-23 25" fill="url(#mint)"/>
+  </g>
+ </g>
+ <!-- Little home: the first asset. -->
+ <g transform="translate(145 528) rotate(-6)">
+  <ellipse cy="53" rx="58" ry="9" fill="#14275d" opacity=".3"/>
+  <rect x="-37" y="-8" width="74" height="57" rx="7" fill="#fff0ce"/>
+  <path d="M-49-7L0-47 49-7" fill="#ecadc9" stroke="#f9d5e4" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="-10" y="14" width="21" height="35" rx="5" fill="#6489c5"/>
+  <rect x="-28" y="8" width="13" height="15" rx="3" fill="#9ed6df"/><rect x="19" y="8" width="13" height="15" rx="3" fill="#9ed6df"/>
+  <circle cx="6" cy="32" r="1.5" fill="#ffe2a0"/>
+  <circle cx="-43" cy="38" r="12" fill="#a3d9bc"/><circle cx="-32" cy="44" r="11" fill="#80c8b6"/>
+  <path d="M-47-26v-16h10v8" fill="#d48cae"/>
+ </g>
+ <!-- A cheerful calculator and coin collection. -->
+ <g transform="translate(540 540)">
+  <ellipse cy="42" rx="57" ry="10" fill="#182456" opacity=".3"/>
+  <g transform="rotate(12)"><rect x="-30" y="-49" width="58" height="84" rx="12" fill="#d4c6fa" stroke="#eee4ff" stroke-width="2"/>
+   <rect x="-21" y="-38" width="40" height="20" rx="5" fill="#283a6d"/>
+   <path d="M-14-26h9m5 0h12" stroke="#a8edce" stroke-width="3" stroke-linecap="round"/>
+   <g fill="#fff8ed"><rect x="-20" y="-7" width="10" height="10" rx="3"/><rect x="-5" y="-7" width="10" height="10" rx="3"/><rect x="10" y="-7" width="10" height="10" rx="3"/><rect x="-20" y="9" width="10" height="10" rx="3"/><rect x="-5" y="9" width="10" height="10" rx="3"/></g><rect x="10" y="9" width="10" height="15" rx="3" fill="#f8cd78"/>
+  </g>
+  <g transform="translate(34 37)"><use href="#coin"/><use href="#coin" y="-9"/><use href="#coin" y="-18"/></g>
+ </g>
+ <g opacity=".8"><use href="#spark" x="220" y="115"/><use href="#spark" x="103" y="242"/><use href="#spark" x="592" y="230"/><use href="#spark" x="475" y="107"/><use href="#spark" x="221" y="576"/><use href="#spark" x="591" y="477"/><use href="#spark" x="108" y="470"/></g>
+</svg>
