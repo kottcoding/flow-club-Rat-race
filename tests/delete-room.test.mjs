@@ -18,7 +18,11 @@ test('legacy rooms are not assigned to a possibly transferred host',()=>{
 test('API deletion authorizes immutable creator, removes rooms, and blocks stale writes',async()=>{
  const base=process.env.TEST_URL||'http://127.0.0.1:8788';
  const tokens=Array.from({length:3},()=>crypto.randomUUID()+crypto.randomUUID());
+<<<<<<< HEAD
  async function req(i,body,id){const res=await fetch(base+'/api/game'+(id?'?room='+id:''),{method:body?'POST':'GET',headers:{Authorization:'Bearer '+tokens[i],...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify({...body,clientVersion:3})}:{})});return {status:res.status,...await res.json()};}
+=======
+ async function req(i,body,id){const res=await fetch(base+'/api/game'+(id?'?room='+id:''),{method:body?'POST':'GET',headers:{Authorization:'Bearer '+tokens[i],...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify({...body,clientVersion:2})}:{})});return {status:res.status,...await res.json()};}
+>>>>>>> 2a87eb6efabba48a79f591bded19c85af80edbf4
  let d=await req(0,{type:'create',name:'Owner',title:'Deletion test'});const id=d.room.id;
  assert.equal(d.canDelete,true);assert.equal(d.room.creatorKey,undefined);
  d=await req(1,{type:'join',room:id,name:'Guest'});assert.equal(d.canDelete,false);
