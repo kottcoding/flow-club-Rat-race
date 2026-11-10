@@ -123,11 +123,11 @@ export function apply(g,pid,a,rng=random){const p=g.players.find(x=>x.id===pid);
  if(a.type==='bankrupt'){check(g.phase==='insolvent','INVALID_ACTION');p.assets=[];p.loan=0;p.cash=0;p.skip=3;g.phase='end';log(g,p,['ปรับโครงสร้าง: ล้างสินทรัพย์และเงินกู้ธนาคาร พัก 3 ตา','Restructuring: assets and bank loans cleared; skip 3 turns']);return;}
  if(a.type==='end'){check(g.phase==='end','FINISH_ACTION');qualify(g,p);if(g.status==='finished')return;g.turn=(g.turn+1)%g.players.length;if(!g.turn)g.round++;g.phase='roll';g.event=null;g.dice=[];return;}
  if(a.type==='roll'){
-  check(g.phase==='roll','ALREADY_ROLLED');if(p.needsRestructure){delete p.needsRestructure;if(totals(p).monthly<0){g.phase='insolvent';return;}}if(p.skip){p.skip--;g.phase='end';log(g,p,['พักตา','Skipped turn'],`${p.skip} remaining`);return;}
+  check(g.phase==='roll','ALREADY_ROLLED');g.landedTile=null;if(p.needsRestructure){delete p.needsRestructure;if(totals(p).monthly<0){g.phase='insolvent';return;}}if(p.skip){p.skip--;g.phase='end';log(g,p,['พักตา','Skipped turn'],`${p.skip} remaining`);return;}
   const count=p.track==='fast'?(p.charity?number(a.count||2,1,3):2):(p.charity?number(a.count||1,1,2):1);g.dice=Array.from({length:count},()=>rng(6)+1);if(p.track==='rat'&&p.charity)p.charity--;
   const board=p.track==='rat'?inner:roomBoard(g);let n=g.dice.reduce((x,y)=>x+y,0);log(g,p,['ทอยลูกเต๋า','Rolled dice'],g.dice.join(' + ')+` = ${n}`);g.phase='end';
   for(let i=0;i<n;i++){p.position=(p.position+1)%board.length;const tile=board[p.position];if(tile==='pay'){const t=totals(p);log(g,p,['สูตร Pay Day','Pay Day calculation'],`(${p.salary} + ${t.passive}) − ${t.expenses} = ${t.monthly}`);expense(g,p,-t.monthly,['Pay Day: รายได้ − ค่าใช้จ่าย','Pay Day: income − expenses']);if(isPhoto(g))settleDeferred(g,p,photoContext);}if(tile==='cashday')cash(g,p,p.fastIncome,['CASHFLOW Day','CASHFLOW Day']);}
-  if(g.phase==='insolvent')return;const tile=board[p.position];
+  g.landedTile=board[p.position];if(g.phase==='insolvent')return;const tile=board[p.position];
   if(tile==='deal'){g.phase='choose';g.event={type:'deal'};}
   if(tile==='charity'){g.phase='decision';g.event={type:'charity',cost:p.track==='rat'?Math.ceil(totals(p).income*.1):100000*economyScale(g)};}
   if(tile==='baby'&&p.children<3){p.children++;log(g,p,['มีสมาชิกใหม่ในครอบครัว','A new baby'],`${p.children} × ${p.child} = ${p.children*p.child} / month`);}
