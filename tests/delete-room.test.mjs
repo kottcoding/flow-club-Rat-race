@@ -26,6 +26,7 @@ test('API deletion authorizes immutable creator, removes rooms, and blocks stale
  let list=await req(0);assert.equal(list.rooms.find(r=>r.id===id).canDelete,true);
  assert.equal((await req(1)).rooms.find(r=>r.id===id).canDelete,false);
  d=await req(0,null,id);d=await req(0,{type:'action',room:id,revision:d.revision,action:{type:'leave'}});
+ assert.equal(d.left,true);assert.equal(d.room,undefined);d=await req(1,null,id);
  assert.equal(d.room.host,d.room.players[0].id);
  assert.equal((await req(1,{type:'deleteRoom',room:id})).status,403);
  assert.equal((await req(0,{type:'deleteRoom',room:id})).deleted,id);
