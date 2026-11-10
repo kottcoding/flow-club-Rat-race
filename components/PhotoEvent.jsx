@@ -10,7 +10,7 @@ export default function PhotoEvent({g,me,lang,busy,action}){
  const e=g.event,L=(th,en)=>lang==='th'?th:en,T=a=>a?.[lang==='th'?0:1],m=v=>'฿'+new Intl.NumberFormat('en-US',{maximumFractionDigits:2}).format(v||0);
  const mine=g.players[g.turn].id===me.id,done=e.done?.includes(me.id),eligible=me.assets.filter(a=>canSell(g,me,a));
  const Button=({children,onClick,disabled,secondary})=><button className={'btn '+(secondary?'secondary':'')} disabled={busy||disabled} onClick={onClick}>{children}</button>;
- return <div className="photo-event"><span className="eyebrow">{L('การ์ดจากภาพของคุณ','YOUR CARD PHOTOS')} · {e.id}</span><h3>{T(e.name)}</h3><CardReference card={e} lang={lang}/>
+ return <div className="photo-event"><h3>{T(e.name)}</h3><CardReference card={e} lang={lang}/>
  {g.phase==='market'&&<>
  <p>{e.scope==='drawer'?L('สิทธิ์เฉพาะผู้เปิดการ์ด','Drawer only'):L('ผู้ถือสินทรัพย์ที่ตรงการ์ดมีสิทธิ์ขาย','Matching asset holders may sell')}</p>
  {eligible.map(a=>{const value=saleValue(e,a);return <section className="market-holding" key={a.id}><strong>{T(a.name)} × {a.qty}</strong>
