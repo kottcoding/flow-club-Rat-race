@@ -7,6 +7,12 @@
     "nodejs_compat"
   ],
   "workers_dev": true,
+  "vars": {
+  "FIREBASE_PROJECT_ID": "flow-club-1d62e",
+  "FIREBASE_API_KEY": "AIzaSyDZLNx5e2-PdTiWJiN62a1xmWKNLotEtOw",
+  "FIREBASE_AUTH_DOMAIN": "flow-club-1d62e.firebaseapp.com",
+  "AUTH_PROVIDERS": "google.com"
+},
   "d1_databases": [
     {
       "binding": "DB",
