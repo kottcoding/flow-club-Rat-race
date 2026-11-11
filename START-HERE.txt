@@ -1,0 +1,15 @@
+FLOW CLUB — Accounts + Avatars update
+
+เริ่มอ่าน INSTALL-ACCOUNTS-AVATARS-TH.md ก่อนติดตั้ง
+1. สำรองงาน แล้ววางโฟลเดอร์ app/components/lib/public/db/tests ให้ตรงตำแหน่งเดิม
+2. Execute db/002-player-accounts.sql ใน D1 flow-club-db
+3. Commit + Push และรอ Cloudflare Deploy
+4. ตั้งค่า Firebase และ Google/Microsoft/Apple ตามคู่มือ แล้วเพิ่ม vars ใน wrangler.jsonc เดิม
+
+Guest ใช้งานได้โดยไม่ต้องตั้งค่า Firebase
+Sign-in ยังต้องตั้งค่าผู้ให้บริการจริงก่อนเปิดใช้ ไม่ได้เปิด Login หรือ deploy เว็บไซต์จริงให้ในแพตช์นี้
+
+Verified: production build; 76 unit/in-process API tests; live local Guest/multiplayer/room deletion API checks; desktop 1440px and mobile 390px; Thai/English; 6 avatars loaded and active rainbow animation at 5 seconds.
+Real Google/Microsoft/Apple OAuth remains to be tested after owner configuration. No production credentials or test bypass included.
+
+รักษาฟีเจอร์เดิม: การ์ด 169 ใบ, Dream, กติกา, ห้อง 6 คน, ลบ/เตะ/ออกห้อง, อายุห้อง 7 วัน, ธีม, กรอบสีการ์ดและ Fast Track celebration.

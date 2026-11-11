@@ -1,0 +1,49 @@
+'use client';
+import {useEffect,useRef,useState} from 'react';
+import {PlayerAvatar,AvatarPicker} from './PlayerAvatar';
+export function useAccount(guestToken){
+ const [config,setConfig]=useState(null),[ready,setReady]=useState(false),[user,setUser]=useState(null),[profile,setProfile]=useState(null),[stats,setStats]=useState(null),[failure,setFailure]=useState(''),[version,setVersion]=useState(0);
+ const sdk=useRef(null),current=useRef(null),generation=useRef(0);
+ async function api(body,guest){const u=current.current;if(!u)throw new Error('SIGN_IN_REQUIRED');const res=await fetch('/api/account',{method:body?'POST':'GET',headers:{Authorization:'Bearer '+await u.getIdToken(),...(body?{'Content-Type':'application/json'}:{}),...(guest?{'X-Guest-Session':guest}:{})},...(body?{body:JSON.stringify(body)}:{})});const d=await res.json();if(!res.ok)throw new Error(d.error);return d;}
+ async function reload(){const u=current.current,d=await api();if(current.current===u){setProfile(d.profile);setStats(d.stats);}return d;}
+ useEffect(()=>{let live=true,unsubscribe;
+  (async()=>{try{const r=await fetch('/api/account?config');if(!r.ok)throw new Error('AUTH_UNAVAILABLE');const c=await r.json();if(!live)return;setConfig(c);if(!c.enabled){setReady(true);return;}
+   const sdkUrl=new URL('/firebase-client.mjs',window.location.origin).href;const module=await import(/* @vite-ignore */ sdkUrl);const client=await module.connect(c.firebase);if(!live)return;sdk.current=client;
+   unsubscribe=client.watch(async u=>{if(!live)return;current.current=u;generation.current++;setUser(u);setProfile(null);setStats(null);setVersion(v=>v+1);setReady(true);if(u){try{await reload();}catch(e){if(live)setFailure(e.message);}}});
+  }catch(e){if(live){setFailure(e.message);setReady(true);}}})();return()=>{live=false;unsubscribe?.();};
+ },[]);
+ async function login(id,claim){if(!sdk.current)throw new Error('AUTH_UNAVAILABLE');const result=await sdk.current.login(id);current.current=result.user;await reload();if(claim)await api({type:'claim'},guestToken);generation.current++;setVersion(v=>v+1);}
+ async function link(id){await sdk.current.link(id);await current.current.getIdToken(true);await reload();setVersion(v=>v+1);}
+ async function logout(){await sdk.current?.logout();current.current=null;setUser(null);setProfile(null);setStats(null);generation.current++;setVersion(v=>v+1);}
+ async function save(body){const d=await api({type:'profile',...body});setProfile(d.profile);return d.profile;}
+ return {ready,config,user,profile,stats,failure,version,generation,login,link,logout,save,reload,claim:async()=>{await api({type:'claim'},guestToken);generation.current++;setVersion(v=>v+1);},authorization:async()=>current.current?'Bearer '+await current.current.getIdToken():'Bearer '+guestToken};
+}
+const messages={
+ 'auth/popup-closed-by-user':['ยกเลิกการเข้าสู่ระบบแล้ว','Sign-in cancelled.'],
+ 'auth/popup-blocked':['เบราว์เซอร์บล็อกหน้าต่าง Login กรุณาอนุญาต Popup แล้วลองอีกครั้ง','Allow popups and try again.'],
+ 'auth/account-exists-with-different-credential':['กรุณาเข้าสู่ระบบด้วยบัญชีเดิมก่อน แล้วใช้เมนูเชื่อมบัญชี','Sign in with your existing provider first, then link this provider.'],
+ 'auth/credential-already-in-use':['บัญชีนี้ผูกกับผู้เล่นอีกคนแล้ว ยังไม่สามารถรวมผู้เล่นอัตโนมัติ','This account belongs to another player. Automatic account merging is not available.'],
+ SEAT_CONFLICT:['Guest และบัญชีนี้มีที่นั่งในห้องเดียวกัน กรุณาจัดการที่นั่งเดิมก่อนเชื่อมข้อมูล','Guest and account both have a seat in the same room. Resolve the duplicate seats before importing.'],
+ GUEST_ALREADY_LINKED:['Guest นี้ผูกกับบัญชีอื่นแล้ว','This Guest belongs to another account.'],
+ AUTH_UNAVAILABLE:['บริการเข้าสู่ระบบยังไม่พร้อม ลองใหม่หรือเล่นแบบ Guest','Sign-in unavailable. Retry or continue as Guest.'],
+ SIGN_IN_REQUIRED:['กรุณาเข้าสู่ระบบอีกครั้ง','Please sign in again.']
+};
+export default function AccountPanel({account,name,avatarId,lang,onSave,onLogout}){
+ const [open,setOpen]=useState(false),[draft,setDraft]=useState(name),[selected,setSelected]=useState(avatarId),[mode,setMode]=useState('avatar'),[busy,setBusy]=useState(false),[error,setError]=useState(''),[success,setSuccess]=useState(''),[claim,setClaim]=useState(false);const dialog=useRef(null);const L=(th,en)=>lang==='th'?th:en;
+ useEffect(()=>{if(open){setDraft(account.profile?.name||name);setSelected(account.profile?.avatar.id??avatarId);setMode(account.profile?.avatar.mode||'avatar');dialog.current?.showModal();}else dialog.current?.close();},[open,account.profile]);
+ async function work(fn){if(busy)return;setBusy(true);setError('');setSuccess('');try{await fn();}catch(e){const key=e.code||e.message;setError(messages[key]?.[lang==='th'?0:1]||L('ทำรายการไม่สำเร็จ: ','Unable to complete: ')+key);}finally{setBusy(false);}}
+ const linked=account.user?.providerData?.map(p=>p.providerId)||[];
+ return <><button className="account-trigger" onClick={()=>{setOpen(true);if(account.user)account.reload().catch(e=>setError(e.message));}}><PlayerAvatar player={{avatar:account.profile?.avatar||{id:avatarId}}} number={false}/><span>{account.user?(account.profile?.name||L('บัญชีของฉัน','My account')):L('โปรไฟล์ / เข้าสู่ระบบ','Profile / Sign in')}</span></button>
+ <dialog ref={dialog} className="account-dialog" onCancel={e=>{if(busy)e.preventDefault();else setOpen(false);}} onClose={()=>setOpen(false)}><button className="close" disabled={busy} onClick={()=>setOpen(false)} aria-label={L('ปิด','Close')}>×</button><span className="eyebrow">YOUR PLAYER PROFILE</span><h2>{account.user?L('ตัวคุณ ใน Flow Club','Your Flow Club identity'):L('เลือกตัวตน แล้วเริ่มเล่น','Pick your look. Start playing.')}</h2>
+ {error&&<p role="alert" className="account-error">{error}</p>}{success&&<p role="status">{success}</p>}
+ {!account.user&&<><p>{L('เล่นแบบ Guest ได้ทันที หรือเข้าสู่ระบบเพื่อกลับมาใช้ผู้เล่นเดิมบนเครื่องอื่น','Play as Guest, or sign in to access the same player on other devices.')}</p><div className="provider-buttons">{[['google.com','Google'],['microsoft.com','Microsoft'],['apple.com','Apple']].map(([id,label])=><button key={id} className="btn secondary" disabled={busy||!account.ready||!account.config?.providers.includes(id)} onClick={()=>work(()=>account.login(id,claim))}>{L('ดำเนินการต่อด้วย ','Continue with ')}{label}</button>)}</div>{account.config?.enabled?<label className="claim-option"><input type="checkbox" checked={claim} onChange={e=>setClaim(e.target.checked)}/>{L('นำที่นั่งและสิทธิ์ห้อง Guest บนเครื่องนี้ไปผูกกับบัญชีด้วย','Import this device’s Guest seats and room ownership into my account')}</label>:<p className="account-note">{L('ขณะนี้เปิดให้เล่นแบบ Guest · Social Sign-in จะเปิดเมื่อผู้ดูแลตั้งค่าเสร็จ','Guest play is available. Social sign-in opens after the administrator completes setup.')}</p>}</>}
+ <div className="profile-preview"><PlayerAvatar player={{avatar:{id:selected,mode,photo:account.profile?.avatar.photo}}} number={false}/><div><strong>{draft||L('ผู้เล่นของคุณ','Your player')}</strong><small>{account.user?L('บันทึกกับบัญชี · ใช้ข้ามเครื่องได้','Saved to your account'):L('Guest · บันทึกในเบราว์เซอร์นี้','Guest · saved in this browser')}</small></div></div>
+ <label>{L('ชื่อผู้เล่น','Player name')}<input maxLength={24} value={draft} onChange={e=>setDraft(e.target.value)}/></label>
+ {account.profile?.avatar.photo&&<label className="claim-option"><input type="checkbox" checked={mode==='photo'} onChange={e=>setMode(e.target.checked?'photo':'avatar')}/>{L('ใช้รูปโปรไฟล์จากบัญชี','Use my account photo')}</label>}
+ <AvatarPicker value={mode==='avatar'?selected:-1} onChange={id=>{setSelected(id);setMode('avatar');}} lang={lang}/>
+ <button className="btn" disabled={busy||!draft.trim()} onClick={()=>work(async()=>{if(account.user)await account.save({name:draft,avatarId:selected,mode});await onSave({name:draft,avatarId:selected});setSuccess(L('บันทึกแล้ว ชื่อในเกมที่เริ่มแล้วจะคงเดิมจนจบ','Saved. Names in games already started stay unchanged until the end.'));})}>{L('บันทึกโปรไฟล์','Save profile')}</button>
+ {account.user&&<><div className="account-stats"><span>{account.stats?.played||0}<small>{L('เกมจบแล้ว','Completed')}</small></span><span>{account.stats?.wins||0}<small>{L('ชนะ','Wins')}</small></span><span>{account.stats?.escaped||0}<small>Fast Track</small></span></div><p className="account-note">{L('สถิตินับเกมที่จบหลังเปิดระบบบัญชี ห้องยังหมดอายุหลังสร้าง 7 วัน','Stats include games finished after accounts were enabled. Rooms still expire 7 days after creation.')}</p><details><summary>{L('เชื่อมบัญชีเพิ่มเติม / นำเข้า Guest','Link providers / import Guest')}</summary><p>{L('บัญชีที่เชื่อมจะเข้าถึงผู้เล่นเดียวกัน และนำข้อมูลระบุตัวตนมาเชื่อมกันเมื่อคุณยืนยัน','Linked providers access this same player. Linking associates their identity information after your confirmation.')}</p>{[['google.com','Google'],['microsoft.com','Microsoft'],['apple.com','Apple']].map(([id,label])=><button key={id} className="btn secondary" disabled={busy||linked.includes(id)||!account.config?.providers.includes(id)} onClick={()=>work(()=>account.link(id))}>{label}{linked.includes(id)?' ✓':' +'}</button>)}<button className="btn secondary" disabled={busy} onClick={()=>work(async()=>{await account.claim();setSuccess(L('เชื่อมข้อมูล Guest แล้ว','Guest imported.'));})}>{L('นำเข้า Guest ของเครื่องนี้','Import this device’s Guest')}</button></details><button className="btn leave-room-btn" disabled={busy} onClick={()=>work(async()=>{await account.logout();onLogout();setOpen(false);})}>{L('ออกจากระบบ','Sign out')}</button></>}
+ {!account.user&&<button className="text-button" disabled={busy} onClick={()=>setOpen(false)}>{L('เล่นแบบ Guest ต่อ','Continue as Guest')}</button>}
+ {account.failure&&<p className="account-error">{L('โหลดบัญชีไม่สำเร็จ กรุณาลองรีเฟรช: ','Account could not load. Please refresh: ')}{account.failure}</p>}
+ </dialog></>;
+}

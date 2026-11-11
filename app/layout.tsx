@@ -3,6 +3,7 @@ import "./globals.css";
 import "../components/game-data.css";
 import "../components/flow-garden.css";
 import "../components/event-cards.css";
+import "../components/player-identity.css";
 
 export const metadata: Metadata = {
   title: "Flow Club | Play your way to freedom",
