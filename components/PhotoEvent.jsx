@@ -1,9 +1,11 @@
 'use client';
+import {WaitingResponses} from './RoomExtras';
+import {CardDetails} from './CardDetails';
 import {useState} from 'react';
 import {assetDebt,canSell,saleValue,expenseCost} from '../lib/photo-rules.mjs';
 export function CardReference({card,lang}){
  const L=(th,en)=>lang==='th'?th:en;
- return <>{card.description&&<p>{card.description[lang==='th'?0:1]}</p>}{card.dataWarning&&<p className="card-warning" role="note">{L(card.dataWarning,card.warningEn||'The printed figures contain an inconsistency. The app uses the individual amounts shown in the photo; see the source image.')}</p>}{card.photo&&<details className="card-reference"><summary>{L('ดูภาพการ์ดอ้างอิง','View source card')} · {card.photoFile}</summary><img loading="lazy" src={card.photo} alt={L('ภาพการ์ดอ้างอิง','Source card photograph')} /></details>}</>;
+ return <><CardDetails card={card} lang={lang}/>{card.description&&<p>{card.description[lang==='th'?0:1]}</p>}{card.dataWarning&&<p className="card-warning" role="note">{L(card.dataWarning,card.dataWarningEn||card.warningEn||'The printed figures contain an inconsistency. The app uses the individual amounts shown in the photo; see the source image.')}</p>}{card.photo&&<details className="card-reference"><summary>{L('ดูภาพการ์ดอ้างอิง','View source card')} · {card.photoFile}</summary><img loading="lazy" src={card.photo} alt={L('ภาพการ์ดอ้างอิง','Source card photograph')} /></details>}</>;
 }
 export default function PhotoEvent({g,me,lang,busy,action}){
  const [qty,setQty]=useState(1),[sellQty,setSellQty]=useState({}),[buyer,setBuyer]=useState(''),[fee,setFee]=useState(0);
@@ -20,7 +22,7 @@ export default function PhotoEvent({g,me,lang,busy,action}){
  </section>;})}
  {e.type==='quote'&&e.drawer===me.id&&!done&&me.track==='rat'&&<div className="market-buy"><p>{L('เฉพาะคุณซื้อได้ในราคานี้','Only you may buy at this price')}: {m(e.price)}</p><label>{L('จำนวนซื้อ','Quantity')}<input type="number" min="1" max="100000" value={qty} onChange={ev=>setQty(Number(ev.target.value))}/></label><div className="formula">{qty} × {m(e.price)} = {m(qty*e.price)}<br/>{L('รายได้เพิ่มต่อเดือน','Added monthly income')}: {qty} × {m(e.flow)} = {m(qty*e.flow)}</div><Button onClick={()=>action({type:'marketBuy',qty})}>{L('ซื้อ','Buy')}</Button></div>}
  {!eligible.length&&<p>{L('ไม่มีสินทรัพย์ที่คุณขายได้ในเหตุการณ์นี้','No eligible assets to sell in this event.')}</p>}
- <Button disabled={done} onClick={()=>action({type:'marketDone'})}>{done?L('รอผู้เล่นอื่น','Waiting for others'):L('เสร็จแล้ว / ไม่ขาย','Done / keep assets')}</Button><p>{e.done.length} / {g.players.length}</p>
+ <Button disabled={done} onClick={()=>action({type:'marketDone'})}>{done?L('รอผู้เล่นอื่น','Waiting for others'):L('เสร็จแล้ว / ไม่ขาย','Done / keep assets')}</Button><WaitingResponses g={g} me={me} lang={lang}/>
  </>}
  {g.phase==='decision'&&e.type==='investment'&&<>
  <div className="deal-stats"><div><small>{L('เงินลงทุน / เงินดาวน์','Investment / down payment')}</small><strong>{m(e.down)}</strong></div><div><small>{L('กระแสเงินสดต่อเดือน','Monthly cash flow')}</small><strong>{m(e.flow)}</strong></div></div>
