@@ -19,3 +19,19 @@ export function FastTrackCelebration({g,lang}){
  useEffect(()=>()=>clearTimeout(timer.current),[]);
  return <div className="escape-announcer" role="status" aria-live="polite">{names.length>0&&<div className="escape-toast"><span aria-hidden="true">✦ ★ ✦</span><strong>{names.join(', ')}</strong><div>{lang==='th'?'ยินดีด้วย! เข้าสู่ Fast Track แล้ว':'Congratulations! Welcome to the Fast Track'}</div><div className="escape-confetti" aria-hidden="true">{Array.from({length:16},(_,i)=><i key={i} style={{'--i':i}}/>)}</div></div>}</div>;
 }
+
+export function WinnerCelebration({g,lang}){
+ const th=lang==='th',winner=g.status==='finished'&&g.players.find(p=>p.id===g.winner);
+ const [show,setShow]=useState(false),[run,setRun]=useState(0);
+ useEffect(()=>{
+  setShow(false);
+  if(!winner)return;
+  const key='flow-winner:'+g.id+':'+winner.id;
+  try{if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,'1');}catch{}
+  setShow(true);
+ },[g.id,winner?.id]);
+ useEffect(()=>{if(!show)return;const timer=setTimeout(()=>setShow(false),8500);return()=>clearTimeout(timer);},[show,run]);
+ if(!winner)return null;
+ return <><section className="winner winner-banner" role="status"><span className="winner-trophy" aria-hidden="true">🏆</span><div><small>{th?'ยินดีกับผู้ชนะ · DREAM ACHIEVED':'CONGRATULATIONS · DREAM ACHIEVED'}</small><strong>{winner.name} — {th?'ทำความฝันสำเร็จแล้ว!':'Dream achieved!'}</strong><p>{th?'จากก้าวแรก สู่ความฝันที่เป็นจริง':'From the first step to a dream come true'}</p></div><button className="btn secondary" onClick={()=>{setRun(n=>n+1);setShow(true);}}>{th?'ฉลองอีกครั้ง ✨':'Celebrate again ✨'}</button></section>
+ {show&&<div className="winner-fireworks" key={run}><button className="fireworks-close" onClick={()=>setShow(false)} aria-label={th?'ปิดพลุเฉลิมฉลอง':'Dismiss fireworks'}>✕</button><svg viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">{Array.from({length:10},(_,i)=>{const x=[180,760,490,280,840,100,650,400,900,550][i],y=[200,250,130,440,480,580,390,610,140,520][i];return <g key={i} transform={`translate(${x} ${y})`}>{Array.from({length:24},(_,j)=>{const a=j*Math.PI/12,r=100+(j%3)*22;return <circle key={j} className="firework-spark" r={j%2?3:4} fill={['#ffcf57','#fc7fc5','#7ee5d3','#a49aff','#7ccfff'][i%5]} style={{'--dx':Math.cos(a)*r+'px','--dy':Math.sin(a)*r+'px','--delay':i*.55+'s'}}/>;})}</g>;})}</svg><div className="fireworks-message" aria-hidden="true">✨ {th?'ยินดีด้วย!':'Congratulations!'} ✨</div></div>}</>;
+}
