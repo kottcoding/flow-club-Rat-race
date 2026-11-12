@@ -2,6 +2,7 @@
 import {useState} from 'react';
 import {avatarId,avatarPath,playerPhoto,AVATAR_COUNT} from '../lib/avatars.mjs';
 export function PlayerAvatar({player,index=0,active=false,number=true,lang='th'}){
+ index=player?.seatIndex??index;
  const [failed,setFailed]=useState(''),src=playerPhoto(player,index),fallback=avatarPath(avatarId(player?.avatar?.id,index));
  return <span className={'player-face '+(active?'is-turn':'')} style={{'--seat-color':['#8751d4','#c57b08','#148573','#c44364','#277bb7','#a5449a'][index%6]}}>
   <span className="face-crop"><img src={failed===src?fallback:src} alt="" referrerPolicy="no-referrer" onError={()=>setFailed(src)}/></span>
