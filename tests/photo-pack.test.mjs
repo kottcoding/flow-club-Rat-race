@@ -49,3 +49,23 @@ test('all four split cards update all lots and Fast Track holders, but not unrel
   const empty=game();open(empty,'small',index);assert.deepEqual(empty.event.splitResults,[]);
  }
 });
+
+test('repair cards charge only the drawer with eligible owned property, once, including retained contracted houses',()=>{
+ for(const [deck,index,cost] of [['small',6,5000],['big',18,20000],['big',22,4000]]){
+  for(const category of ['house','condo','singleShop','duplex','fourplex','apartment','land100','stock']){
+   const g=game(),[p,q]=g.players;
+   p.assets=[{id:'a',type:category==='stock'?'stock':'property',category,qty:3},{id:'b',type:category==='stock'?'stock':'property',category,qty:2}];
+   q.assets=[{type:'property',category:'fourplex',qty:5}];
+   const expected=category==='stock'||category==='land100'||index===18&&category!=='fourplex'?0:cost;
+   const before=g.players.map(x=>({cash:x.cash,loan:x.loan}));open(g,deck,index);
+   assert.equal(g.event.amountDue,expected);
+   assert.throws(()=>apply(g,q.id,{type:'payExpense'}));
+   apply(g,p.id,{type:'payExpense'});
+   assert.equal(p.cash,before[0].cash-expected);assert.equal(q.cash,before[1].cash);assert.equal(q.loan,before[1].loan);
+   assert.throws(()=>apply(g,p.id,{type:'payExpense'}));
+  }
+  const g=game(),p=g.players[0];p.assets=[{type:'property',category:'fourplex',qty:0}];open(g,deck,index);assert.equal(g.event.amountDue,0);
+  p.cash=-1;const loan=p.loan;apply(g,p.id,{type:'payExpense'});assert.equal(p.loan,loan);assert.equal(p.cash,-1);
+ }
+ const g=game(),p=g.players[0];p.assets=[{type:'property',category:'house',qty:1,contract:{remaining:40}}];open(g,'small',6);assert.equal(g.event.amountDue,5000);
+});
