@@ -15,6 +15,7 @@ export default function PhotoEvent({g,me,lang,busy,action}){
  const mine=g.players[g.turn].id===me.id,done=e.done?.includes(me.id),eligible=me.assets.filter(a=>canSell(g,me,a));
  const Button=({children,onClick,disabled,secondary})=><button className={'btn '+(secondary?'secondary':'')} disabled={busy||disabled} onClick={onClick}>{children}</button>;
  return <div className="photo-event"><h3>{T(e.name)}</h3><CardReference card={e} lang={lang}/>
+ {e.type==='split'&&e.resolved&&<section className="formula"><strong>{L('ผลการปรับจำนวนหุ้นอัตโนมัติ','Automatic share adjustment')}</strong>{e.splitResults?.length?e.splitResults.map(r=><p key={r.playerId}>{r.name}: {formatNumber(r.before)} × {formatNumber(e.factor)} = <b>{formatNumber(r.after)}</b> {L('หุ้น','shares')}</p>):<p>{L(e.splitResults?'ไม่มีผู้ถือหุ้นชนิดนี้ จึงไม่มีจำนวนหุ้นเปลี่ยนแปลง':'เหตุการณ์นี้ประมวลผลแล้ว ดูรายละเอียดในแท็บการคำนวณ',e.splitResults?'No matching shareholders; no quantities changed.':'Already processed. See Calculations for details.')}</p>}<p>{L('เงินสดไม่เปลี่ยนแปลง · ต้นทุนรวมเดิม · ไม่ปัดเศษจำนวนหุ้น','Cash unchanged · Total cost basis unchanged · Fractional shares retained')}</p></section>}
  {g.phase==='market'&&<>
  <p>{e.scope==='drawer'?L('สิทธิ์เฉพาะผู้เปิดการ์ด','Drawer only'):L('ผู้ถือสินทรัพย์ที่ตรงการ์ดมีสิทธิ์ขาย','Matching asset holders may sell')}</p>
  {eligible.map(a=>{const value=saleValue(e,a);return <section className="market-holding" key={a.id}><strong>{T(a.name)} × {formatNumber(a.qty)}</strong>

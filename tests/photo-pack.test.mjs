@@ -34,3 +34,18 @@ test('corrected big 26 costs 80000, yields 48 percent ROI and upgrades pending c
  const g=game(),p=g.players[g.turn];open(g,'big',26);g.event.down=800000;normalizeRoom(g);assert.equal(g.event.down,80000);const before=p.cash;apply(g,p.id,{type:'buy',qty:1});assert.equal(p.cash,before-80000);assert.equal(p.assets.at(-1).down,80000);assert.equal(p.assets.at(-1).debt,370000);
  p.assets.at(-1).down=800000;normalizeRoom(g);assert.equal(p.assets.at(-1).down,800000);
 });
+
+test('all four split cards update all lots and Fast Track holders, but not unrelated holdings or cash',()=>{
+ for(const [index,factor,symbol] of [[1,2,'HOME'],[4,.5,'HOME'],[5,2,'PHARMA'],[33,.5,'PHARMA']]){
+  const g=game(),[p,q]=g.players;q.track='fast';
+  for(const x of g.players)x.assets=[{id:'one',type:'stock',symbol,qty:3,cost:100,down:100,flow:0},{id:'two',type:'stock',symbol,qty:10,cost:200,down:200,flow:0},{id:'other',type:'stock',symbol:'ENT',qty:7,cost:50,down:50,flow:0}];
+  const before=g.players.map(x=>({cash:x.cash,basis:x.assets.reduce((sum,a)=>sum+a.down*a.qty,0)}));
+  open(g,'small',index);
+  g.players.forEach((x,i)=>{assert.equal(x.assets[0].qty,3*factor);assert.equal(x.assets[1].qty,10*factor);assert.equal(x.assets[2].qty,7);assert.equal(x.cash,before[i].cash);assert.equal(x.assets.reduce((sum,a)=>sum+a.down*a.qty,0),before[i].basis);assert.equal(canSell(g,x,x.assets[0]),false);});
+  assert.deepEqual(g.event.splitResults.map(r=>[r.before,r.after]),[[13,13*factor],[13,13*factor]]);
+  const snapshot=structuredClone(g.players);
+  for(const x of g.players)for(const type of ['marketBuy','buy','sell'])assert.throws(()=>apply(g,x.id,{type,id:'one',qty:1}));
+  assert.deepEqual(g.players,snapshot);
+  const empty=game();open(empty,'small',index);assert.deepEqual(empty.event.splitResults,[]);
+ }
+});
