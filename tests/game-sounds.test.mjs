@@ -107,3 +107,21 @@ test('buy, sell and confirmed donation use MP3; skipping or viewing charity is s
   assert.deepEqual(audio.soundCues(b,{...b,phase:'end'}),[]);
  }finally{audio.stopSounds();Object.assign(globalThis,saved);}
 });
+
+test('escape and victory play original MP3 once; victory takes priority and refresh stays silent',async()=>{
+ const audio=await import('../lib/game-sounds.mjs?celebration-test');
+ const saved={window:globalThis.window,document:globalThis.document,fetch:globalThis.fetch};let starts=0,source;
+ class Context{state='running';destination={};decodeAudioData(){return Promise.resolve({duration:6});}createBufferSource(){source={connect(){},disconnect(){},start(){starts++;},stop(){}};return source;}createGain(){return {gain:{value:0},connect(){},disconnect(){}};}}
+ globalThis.window={AudioContext:Context};globalThis.document={hidden:false};globalThis.fetch=async()=>({ok:true,arrayBuffer:async()=>new ArrayBuffer(1)});
+ try{
+  audio.configureSound(true,.2);audio.unlockSound();
+  for(const [cue,file] of [['escape','kids-cheering'],['win','victory']]){
+   const b=base(),n=structuredClone(b);n.players[0].track='fast';
+   if(cue==='win'){n.winner='a';n.status='finished';}
+   assert.deepEqual(audio.soundCues(b,n),[cue]);assert.equal(audio.sampleFiles[cue],`/sounds/${file}-v1.mp3`);assert.deepEqual(audio.soundPlan(cue),[]);
+   const count=starts;audio.playSounds(audio.soundCues(b,n));await new Promise(r=>setTimeout(r,20));assert.equal(starts,count+1);assert.equal(source.loop,false);assert.equal(audio.soundDuration(cue),6);
+   assert.deepEqual(audio.soundCues(n,structuredClone(n)),[]);assert.deepEqual(audio.soundCues(null,n),[]);
+  }
+  audio.configureSound(false);audio.playSounds(['win']);await new Promise(r=>setTimeout(r,20));assert.equal(starts,2);
+ }finally{audio.stopSounds();Object.assign(globalThis,saved);}
+});
