@@ -16,10 +16,10 @@ test('audio engine requires interaction, respects mute and hidden tabs, and stop
  try{configureSound(true);playSounds(['buy']);await tick();assert.equal(starts,0);unlockSound();playSounds(['buy']);await tick();assert.equal(starts,6);configureSound(false);const count=starts;playSounds(['win']);await tick();assert.equal(starts,count);assert.ok(stops>=2);configureSound(true);document.hidden=true;playSounds(['win']);await tick();assert.equal(starts,count);document.hidden=false;playSounds(['sell']);stopSounds();await tick();assert.equal(starts,count);}finally{stopSounds();globalThis.window=oldWindow;globalThis.document=oldDocument;}
 });
 
-test('market acknowledgement clicks once and card draw uses shuffle even for expense cards',()=>{
+test('market acknowledgement does not duplicate local UI click over polling',()=>{
  const g={...base(),phase:'market',event:{id:'card',done:[]}};
  const n={...g,phase:'end',event:{id:'card',done:['a']}};
- assert.deepEqual(soundCues(g,n),['click']);assert.deepEqual(soundCues(n,structuredClone(n)),[]);
+ assert.deepEqual(soundCues(g,n),[]);assert.deepEqual(soundCues(n,structuredClone(n)),[]);
 });
 test('requested audio designs and durations match, including 5 second angel and 8 second sad cue',async()=>{
  const {soundPlan,soundDuration}=await import('../lib/game-sounds.mjs');
@@ -40,4 +40,17 @@ test('dice tumble is a short decaying impact sound and precedes landing, payday 
   const g=base(),n={...g,landedTile:tile,log:[{id:'new',title:['',title]},{id:'dice',title:['','Rolled dice']}]};
   assert.equal(soundCues(g,n)[0],'roll');assert.equal(soundCues(g,n).filter(c=>c==='roll').length,1);assert.deepEqual(soundCues(n,structuredClone(n)),[]);
  }
+});
+
+test('MP3 click honors mute, volume and visibility without requiring AudioContext',async()=>{
+ const {configureSound,playButtonSound,stopButtonSound}=await import('../lib/game-sounds.mjs');
+ const oldWindow=globalThis.window,oldDocument=globalThis.document;let clip,plays=0;
+ class Clip{constructor(src){this.src=src;clip=this;}pause(){}play(){plays++;return Promise.resolve();}}
+ globalThis.window={Audio:Clip};globalThis.document={hidden:false};
+ try{configureSound(true,.2);playButtonSound();assert.equal(plays,1);assert.equal(clip.src,'/sounds/click-v1.mp3');assert.equal(clip.volume,.2);playButtonSound();assert.equal(plays,2);assert.equal(clip.currentTime,0);configureSound(false);playButtonSound();assert.equal(plays,2);configureSound(true,0);playButtonSound();assert.equal(plays,2);configureSound(true,.3);document.hidden=true;playButtonSound();assert.equal(plays,2);}finally{stopButtonSound();globalThis.window=oldWindow;globalThis.document=oldDocument;}
+});
+test('disabled buttons are silent; native buttons, summaries and role buttons are eligible',async()=>{
+ const {isSoundButton}=await import('../lib/game-sounds.mjs');
+ const element={disabled:false,getAttribute:()=>null,closest:()=>null,hasAttribute:()=>false};
+ assert.equal(isSoundButton({closest:()=>element}),true);element.disabled=true;assert.equal(isSoundButton({closest:()=>element}),false);assert.equal(isSoundButton({closest:()=>null}),false);assert.equal(isSoundButton(null),false);
 });
