@@ -23,7 +23,7 @@ test('market acknowledgement does not duplicate local UI click over polling',()=
 });
 test('requested audio designs and durations match, including 5 second angel and 8 second sad cue',async()=>{
  const {soundPlan,soundDuration}=await import('../lib/game-sounds.mjs');
- for(const k of ['loan','repay','repayBank','charity'])assert.equal(soundDuration(k),5);
+ assert.equal(soundDuration('charity'),5);
  assert.equal(soundDuration('downsize'),8);
  assert.ok(soundPlan('small').every(n=>n.type==='noise'));
  assert.ok(soundPlan('big').length>soundPlan('small').length);
@@ -69,4 +69,23 @@ test('every requested landing uses the correct MP3 once, without old landing mus
   const g=base(),n={...g,landedTile:tile,log:[{id:'pay',title:['','Pay Day: income − expenses']},{id:'roll',title:['','Rolled dice']}],event:{id:'card',type:'doodad',deck:'doodad'}};
   assert.deepEqual(soundCues(g,n),['roll',cue],tile);assert.deepEqual(soundCues(n,structuredClone(n)),[]);
  }
+});
+
+test('all three bank actions play the supplied MP3 after confirmation and never on unchanged state',async()=>{
+ const audio=await import('../lib/game-sounds.mjs?bank-test');
+ const saved={window:globalThis.window,document:globalThis.document,fetch:globalThis.fetch};let starts=0;
+ const buffer={duration:1.8};
+ class Context{state='running';destination={};decodeAudioData(){return Promise.resolve(buffer);}createBufferSource(){return {connect(){},disconnect(){},start(){starts++;},stop(){}};}createGain(){return {gain:{value:0},connect(){},disconnect(){}};}}
+ globalThis.window={AudioContext:Context};globalThis.document={hidden:false};globalThis.fetch=async()=>({ok:true,arrayBuffer:async()=>new ArrayBuffer(1)});
+ try{
+  audio.configureSound(true,.2);audio.unlockSound();
+  for(const [cue,title] of [['loan','Bank loan received'],['repayBank','Debt repayment'],['repay','Debt repayment']]){
+   const before=base(),after=structuredClone(before);after.log=[{id:cue,title:['',title]}];
+   if(cue==='repayBank')after.players[0].loan=0;
+   assert.equal(audio.sampleFiles[cue],'/sounds/bank-success-v1.mp3');assert.deepEqual(audio.soundPlan(cue),[]);
+   const count=starts;audio.playSounds(audio.soundCues(before,after));await new Promise(r=>setTimeout(r,20));assert.equal(starts,count+1);assert.equal(audio.soundDuration(cue),1.8);
+   audio.playSounds(audio.soundCues(after,structuredClone(after)));await new Promise(r=>setTimeout(r,20));assert.equal(starts,count+1);
+  }
+  audio.configureSound(false);audio.playSounds(['loan']);await new Promise(r=>setTimeout(r,20));assert.equal(starts,3);
+ }finally{audio.stopSounds();Object.assign(globalThis,saved);}
 });
