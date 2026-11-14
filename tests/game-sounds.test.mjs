@@ -54,3 +54,12 @@ test('disabled buttons are silent; native buttons, summaries and role buttons ar
  const element={disabled:false,getAttribute:()=>null,closest:()=>null,hasAttribute:()=>false};
  assert.equal(isSoundButton({closest:()=>element}),true);element.disabled=true;assert.equal(isSoundButton({closest:()=>element}),false);assert.equal(isSoundButton({closest:()=>null}),false);assert.equal(isSoundButton(null),false);
 });
+
+test('baby landing plays the supplied decoded MP3 once and stops on mute',async()=>{
+ const audio=await import('../lib/game-sounds.mjs?baby-test');
+ const saved={window:globalThis.window,document:globalThis.document,fetch:globalThis.fetch};let url,starts=0,stops=0,source,gain;
+ const buffer={duration:2.7};
+ class Context{state='running';destination={};decodeAudioData(){return Promise.resolve(buffer);}createBufferSource(){source={connect(){},disconnect(){},start(){starts++;},stop(){stops++;}};return source;}createGain(){gain={gain:{value:0},connect(){},disconnect(){}};return gain;}}
+ globalThis.window={AudioContext:Context};globalThis.document={hidden:false};globalThis.fetch=async path=>{url=path;return {ok:true,arrayBuffer:async()=>new ArrayBuffer(1)};};
+ try{audio.configureSound(true,.2);audio.unlockSound();audio.playSounds(['baby']);await new Promise(r=>setTimeout(r,20));assert.equal(url,'/sounds/baby-cry-v1.mp3');assert.equal(starts,1);assert.equal(source.buffer,buffer);assert.equal(source.loop,false);assert.equal(gain.gain.value,.2);assert.equal(audio.soundDuration('baby'),2.7);assert.deepEqual(audio.soundPlan('baby'),[]);audio.configureSound(false);assert.equal(stops,1);audio.playSounds(['baby']);assert.equal(starts,1);}finally{audio.stopSounds();Object.assign(globalThis,saved);}
+});
