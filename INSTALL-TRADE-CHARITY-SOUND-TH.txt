@@ -1,0 +1,17 @@
+﻿วิธีอัปเดตเสียงซื้อ-ขายและบริจาค
+
+ซื้อ/ขายสำเร็จ: Cha-Ching! Money.mp3 (public/sounds/money-v1.mp3)
+ยืนยันบริจาคสำเร็จ: Angel.mp3 (public/sounds/angel-v1.mp3)
+ตกช่องบริจาคยังใช้ Ting.mp3; การข้ามบริจาคไม่เล่นเสียง Angel
+ไฟล์เสียงทั้งสองคัดลอกจากต้นฉบับโดยไม่ดัดแปลง
+เสียงปุ่ม Click และเสียงธนาคารจากชุดก่อนหน้ายังคงอยู่
+
+1. สำรองโปรเจกต์ และ Pull origin ใน GitHub Desktop ให้เรียบร้อย
+2. แตก ZIP คัดลอก lib, public และ tests ทับใน repository ระดับเดียวกับ package.json
+3. Commit แล้ว Push origin
+4. รอ Cloudflare deploy สำเร็จ เปิดเว็บไซต์แล้วกด Ctrl+F5
+5. เปิดเสียง แล้วทดลองซื้อ ขาย และยืนยันบริจาค
+
+ไม่ต้องแก้ฐานข้อมูล SQL, Firebase หรือ wrangler.jsonc
+ZIP รวมไฟล์เสียงจากอัปเดตก่อนหน้าให้ครบ
+ยังไม่ได้ deploy ไปยังเว็บไซต์จริง

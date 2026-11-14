@@ -13,7 +13,7 @@ test('audio engine requires interaction, respects mute and hidden tabs, and stop
  class AudioMock{state='running';currentTime=0;destination={};createOscillator(){return {frequency:{setValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){},disconnect(){},start(){starts++;},stop(){stops++;}};}createGain(){return {gain:{setValueAtTime(){},linearRampToValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){},disconnect(){}};}}
  globalThis.window={AudioContext:AudioMock};globalThis.document={hidden:false};
  const tick=()=>new Promise(resolve=>setTimeout(resolve,15));
- try{configureSound(true);playSounds(['buy']);await tick();assert.equal(starts,0);unlockSound();playSounds(['buy']);await tick();assert.equal(starts,6);configureSound(false);const count=starts;playSounds(['win']);await tick();assert.equal(starts,count);assert.ok(stops>=2);configureSound(true);document.hidden=true;playSounds(['win']);await tick();assert.equal(starts,count);document.hidden=false;playSounds(['sell']);stopSounds();await tick();assert.equal(starts,count);}finally{stopSounds();globalThis.window=oldWindow;globalThis.document=oldDocument;}
+ try{configureSound(true);playSounds(['deal']);await tick();assert.equal(starts,0);unlockSound();playSounds(['deal']);await tick();assert.equal(starts,3);configureSound(false);const count=starts;playSounds(['win']);await tick();assert.equal(starts,count);assert.ok(stops>=2);configureSound(true);document.hidden=true;playSounds(['win']);await tick();assert.equal(starts,count);document.hidden=false;playSounds(['sell']);stopSounds();await tick();assert.equal(starts,count);}finally{stopSounds();globalThis.window=oldWindow;globalThis.document=oldDocument;}
 });
 
 test('market acknowledgement does not duplicate local UI click over polling',()=>{
@@ -21,9 +21,9 @@ test('market acknowledgement does not duplicate local UI click over polling',()=
  const n={...g,phase:'end',event:{id:'card',done:['a']}};
  assert.deepEqual(soundCues(g,n),[]);assert.deepEqual(soundCues(n,structuredClone(n)),[]);
 });
-test('requested audio designs and durations match, including 5 second angel and 8 second sad cue',async()=>{
+test('requested audio designs and durations match, including MP3 overrides and 8 second sad cue',async()=>{
  const {soundPlan,soundDuration}=await import('../lib/game-sounds.mjs');
- assert.equal(soundDuration('charity'),5);
+ assert.deepEqual(soundPlan('charity'),[]);
  assert.equal(soundDuration('downsize'),8);
  assert.ok(soundPlan('small').every(n=>n.type==='noise'));
  assert.ok(soundPlan('big').length>soundPlan('small').length);
@@ -87,5 +87,23 @@ test('all three bank actions play the supplied MP3 after confirmation and never 
    audio.playSounds(audio.soundCues(after,structuredClone(after)));await new Promise(r=>setTimeout(r,20));assert.equal(starts,count+1);
   }
   audio.configureSound(false);audio.playSounds(['loan']);await new Promise(r=>setTimeout(r,20));assert.equal(starts,3);
+ }finally{audio.stopSounds();Object.assign(globalThis,saved);}
+});
+
+test('buy, sell and confirmed donation use MP3; skipping or viewing charity is silent',async()=>{
+ const audio=await import('../lib/game-sounds.mjs?trade-test');
+ const saved={window:globalThis.window,document:globalThis.document,fetch:globalThis.fetch};let starts=0;
+ class Context{state='running';destination={};decodeAudioData(){return Promise.resolve({duration:2});}createBufferSource(){return {connect(){},disconnect(){},start(){starts++;},stop(){}};}createGain(){return {gain:{value:0},connect(){},disconnect(){}};}}
+ globalThis.window={AudioContext:Context};globalThis.document={hidden:false};globalThis.fetch=async()=>({ok:true,arrayBuffer:async()=>new ArrayBuffer(1)});
+ try{
+  audio.configureSound(true,.2);audio.unlockSound();
+  for(const [cue,title,file] of [['buy','Buy shares on Market','money'],['sell','Asset sale (after mortgage)','money'],['charity','Charity','angel']]){
+   const b=base(),n={...b,log:[{id:cue,title:['',title]}]};
+   assert.deepEqual(audio.soundCues(b,n),[cue]);assert.equal(audio.sampleFiles[cue],`/sounds/${file}-v1.mp3`);assert.deepEqual(audio.soundPlan(cue),[]);
+   const count=starts;audio.playSounds(audio.soundCues(b,n));await new Promise(r=>setTimeout(r,20));assert.equal(starts,count+1);assert.deepEqual(audio.soundCues(n,structuredClone(n)),[]);
+  }
+  const b={...base(),phase:'decision',event:{type:'charity'}};
+  assert.deepEqual(audio.soundCues(base(),b),[]);
+  assert.deepEqual(audio.soundCues(b,{...b,phase:'end'}),[]);
  }finally{audio.stopSounds();Object.assign(globalThis,saved);}
 });
