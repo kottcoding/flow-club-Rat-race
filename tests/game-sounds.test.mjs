@@ -31,3 +31,13 @@ test('requested audio designs and durations match, including 5 second angel and 
  assert.equal(soundPlan('pay').length,6);
  for(const k of Object.keys(melodies))for(const n of soundPlan(k)){assert.ok(n.duration>0);assert.ok(n.amp<=.3);}
 });
+
+test('dice tumble is a short decaying impact sound and precedes landing, payday and sad cues',async()=>{
+ const {soundPlan,soundDuration}=await import('../lib/game-sounds.mjs');
+ const plan=soundPlan('roll'),hits=plan.filter(n=>n.type==='noise');
+ assert.equal(hits.length,10);assert.ok(hits[0].amp>hits.at(-1).amp);assert.ok(soundDuration('roll')>.8&&soundDuration('roll')<1);
+ for(const [tile,title] of [['deal','Pay Day: income − expenses'],['downsize','Downsized: one month of expenses']]){
+  const g=base(),n={...g,landedTile:tile,log:[{id:'new',title:['',title]},{id:'dice',title:['','Rolled dice']}]};
+  assert.equal(soundCues(g,n)[0],'roll');assert.equal(soundCues(g,n).filter(c=>c==='roll').length,1);assert.deepEqual(soundCues(n,structuredClone(n)),[]);
+ }
+});
