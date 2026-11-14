@@ -1,5 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
+import {useGameSound} from './GameSound';
 import {WinnerCelebration} from './EventPresentation';
 import {PlayerAvatar} from './PlayerAvatar';
 import {roomStatus,statusLabels,responders,waitingPlayers} from '../lib/room-presentation.mjs';
@@ -13,6 +14,7 @@ export function Spectator({id,lang,onExit,Board}){
   if(alive){setData(d);setError('');setUpdated(Date.now());}
  }catch(e){if(alive)setError(e.message);}finally{if(alive)timer=setTimeout(refresh,3000);}}refresh();return()=>{alive=false;clearTimeout(timer);};},[id]);
  const g=data?.room,current=g?.players[g.turn],drawer=g?.players.find(p=>p.id===g.event?.drawer);
+ useGameSound(g);
  const categories={small:L('โอกาสเล็ก','Small Deal'),big:L('โอกาสใหญ่','Big Deal'),market:L('ซื้อ–ขาย','Market'),doodad:L('จ่ายซะ','Doodad'),charity:L('บริจาค','Charity'),dream:L('ความฝัน','Dream'),fast:L('ธุรกิจ','Business')};
  const money=v=>(g?.currency==='THB'?'฿':'$')+new Intl.NumberFormat('en-US',{maximumFractionDigits:2}).format(v||0);
  const unavailable=['ROOM_NOT_FOUND','SPECTATOR_UNAVAILABLE'].includes(error);
