@@ -1,9 +1,10 @@
 "use client";
 import {useEffect,useRef,useState} from 'react';
-import {soundCues,configureSound,unlockSound,playSounds,stopSounds,prepareButtonSound,playButtonSound,stopButtonSound,isSoundButton} from '../lib/game-sounds.mjs';
-export function useGameSound(game){
- const prior=useRef(null);
- useEffect(()=>{if(prior.current?.id!==game?.id)stopSounds();const cues=soundCues(prior.current,game);prior.current=game;playSounds(cues);},[game]);
+import {createSoundTracker,configureSound,unlockSound,playSounds,stopSounds,prepareButtonSound,playButtonSound,stopButtonSound,isSoundButton} from '../lib/game-sounds.mjs';
+export function useGameSound(game,revision){
+ const tracker=useRef(null),room=useRef(null);
+ if(!tracker.current)tracker.current=createSoundTracker();
+ useEffect(()=>{if(room.current!==game?.id){stopSounds();room.current=game?.id;}playSounds(tracker.current(game,revision));},[game,revision]);
  useEffect(()=>()=>stopSounds(),[]);
 }
 export default function GameSound({lang}){

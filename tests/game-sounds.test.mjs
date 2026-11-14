@@ -125,3 +125,24 @@ test('escape and victory play original MP3 once; victory takes priority and refr
   audio.configureSound(false);audio.playSounds(['win']);await new Promise(r=>setTimeout(r,20));assert.equal(starts,2);
  }finally{audio.stopSounds();Object.assign(globalThis,saved);}
 });
+
+test('revision tracker rejects late replies and repeated polling, but allows the next real action',async()=>{
+ const {createSoundTracker}=await import('../lib/game-sounds.mjs');
+ for(const title of ['Bank loan received','Debt repayment','Buy shares on Market','Asset sale (after mortgage)']){
+  const track=createSoundTracker(),b=base(),n={...b,log:[{id:'one',title:['',title]}]},last={...b,log:[{id:'two',title:['',title]},...n.log]};
+  assert.deepEqual(track(b,10),[]);assert.equal(track(n,11).length,1);
+  assert.deepEqual(track(b,10),[]);assert.deepEqual(track(n,11),[]);assert.equal(track(last,12).length,1);
+ }
+ for(const tile of ['pay','market','deal']){
+  const track=createSoundTracker(),b=base(),n={...b,landedTile:tile,log:[{id:'roll',title:['','Rolled dice']}]};
+  track(b,1);assert.deepEqual(track(n,2),['roll','ting']);assert.deepEqual(track(b,1),[]);assert.deepEqual(track(n,2),[]);
+ }
+});
+test('one update plays each shared MP3 once and event buttons suppress the generic click',async()=>{
+ const {uniqueSoundCues,isSoundButton}=await import('../lib/game-sounds.mjs');
+ assert.deepEqual(uniqueSoundCues(['buy','sell','loan','repay','repayBank']),['buy','loan']);
+ assert.deepEqual(uniqueSoundCues(['roll','ting','ting']),['roll','ting']);
+ const el={disabled:false,getAttribute:()=>null,closest:()=>null,hasAttribute:key=>key==='data-event-sound'};
+ assert.equal(isSoundButton({closest:()=>el}),false);
+ el.hasAttribute=()=>false;assert.equal(isSoundButton({closest:()=>el}),true);
+});
