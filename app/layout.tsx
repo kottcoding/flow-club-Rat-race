@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "../components/room-emojis.css";
 import "../components/game-data.css";
 import "../components/flow-garden.css";
 import "../components/event-cards.css";

@@ -1,0 +1,34 @@
+.board-container:has(.room-emojis){position:relative}
+.room-emojis{position:static;margin:0 0 10px;text-align:right}
+.emoji-tools{display:inline-block;position:relative;z-index:12}
+.emoji-tools>.btn{min-height:48px}
+.emoji-picker{position:absolute;right:0;top:calc(100% + 8px);padding:10px;background:#fff;border:1px solid #ded6f7;border-radius:20px;box-shadow:0 12px 32px #30235d25;width:min(320px,80vw)}
+.emoji-grid{display:grid;grid-template-columns:repeat(4,minmax(48px,1fr));gap:6px}
+.emoji-grid button{min-width:48px;min-height:56px;padding:0;border:1px solid #eee8ff;border-radius:13px;background:#f8f5ff;cursor:pointer;transition:background .15s,transform .15s}
+.emoji-grid button:hover{background:#eee5ff;transform:translateY(-2px)}
+.emoji-grid button:focus-visible{outline:3px solid #8565db;outline-offset:2px}
+.emoji-grid img{display:block;width:100%;height:64px;object-fit:contain}
+.emoji-stage{position:absolute;left:5%;right:5%;top:30%;height:190px;display:flex;justify-content:center;align-items:center;gap:4px;pointer-events:none;z-index:10}
+.emoji-bubble{min-width:0;max-width:33%;display:flex;flex-direction:column;align-items:center;animation:emoji-appear 3s both}
+.emoji-bubble img{width:clamp(100px,18vw,180px);height:110px;object-fit:contain;max-width:100%;filter:drop-shadow(0 4px 4px #30235d20)}
+.emoji-bubble span{font-size:12px;font-weight:700;color:#36294c;background:#ffffffed;border:1px solid #e9defa;border-radius:20px;padding:4px 10px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-shadow:0 2px 6px #30235d12}
+.emoji-motion{animation:emoji-bounce .6s ease-in-out infinite alternate}
+.emoji-rocket,.emoji-money{animation:emoji-fly 2.4s ease-in-out infinite}
+.emoji-heart,.emoji-rich{animation:emoji-pulse .7s ease-in-out infinite alternate}
+.emoji-angry,.emoji-laugh,.emoji-fire{animation:emoji-shake .22s ease-in-out infinite alternate}
+.emoji-think,.emoji-cool,.emoji-cry{animation:emoji-tilt .8s ease-in-out infinite alternate}
+.emoji-error{display:block;color:#a52b45;margin:6px 0}
+@keyframes emoji-appear{0%{opacity:0;transform:translateY(20px) scale(.5)}12%{opacity:1;transform:translateY(0) scale(1.08)}24%,80%{opacity:1;transform:scale(1)}100%{opacity:0;transform:translateY(-28px) scale(.85)}}
+@keyframes emoji-bounce{to{transform:translateY(-12px) rotate(8deg)}}
+@keyframes emoji-fly{0%{transform:translate(-10px,12px)}70%,100%{transform:translate(14px,-24px)}}
+@keyframes emoji-pulse{to{transform:scale(1.2)}}
+@keyframes emoji-shake{from{transform:rotate(-7deg)}to{transform:rotate(7deg)}}
+@keyframes emoji-tilt{from{transform:rotate(-9deg)}to{transform:rotate(9deg)}}
+@media(prefers-reduced-motion:reduce){.emoji-bubble,.emoji-motion{animation:none}.emoji-grid button{transition:none}}
+
+.emoji-bubble{position:relative}
+.emoji-bubble:has(.emoji-party)::before,.emoji-bubble:has(.emoji-rich)::before{content:'✦ · ✧ · ✦';position:absolute;top:12px;color:#e7ac28;font-size:22px;white-space:nowrap;animation:emoji-spark 1s ease-out infinite}
+.emoji-bubble:has(.emoji-party)::before{color:#e263b7}
+.emoji-bubble:has(.emoji-cry)::before{content:'💧';position:absolute;top:42px;left:35%;font-size:12px;animation:emoji-spark .8s ease-in infinite}
+@keyframes emoji-spark{from{opacity:.9;transform:translateY(0) scale(.7)}to{opacity:0;transform:translateY(18px) scale(1.3)}}
+@media(prefers-reduced-motion:reduce){.emoji-bubble::before{animation:none!important;display:none}}
