@@ -1,0 +1,11 @@
+﻿อัปเดตไอคอนกระเป๋าพื้นหลังโปร่งใส
+
+1. แตก ZIP แล้วคัดลอก lib และ public ทับ repository ระดับเดียวกับ package.json
+2. Commit และ Push origin
+3. รอ Cloudflare deploy ผ่าน แล้วกด Ctrl+F5
+
+ใช้ business-v2.png เพื่อไม่ให้ติดแคชรูปพื้นหลังตารางเดิม
+ไม่ต้องแก้ฐานข้อมูล ยังไม่ได้ deploy เว็บไซต์จริง
+
+แก้ภาพด้วย built-in image_gen โหมด background-extraction
+Prompt: Remove only the white/gray checkerboard background, including the hole within the handle, to actual transparent alpha. Preserve the brown briefcase, dark thick outline, yellow clasp, shape and flat icon style. Center with modest padding. Do not draw a checkerboard or any backdrop. Output transparent PNG for use as a small business asset icon.
