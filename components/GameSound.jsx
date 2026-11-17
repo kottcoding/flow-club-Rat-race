@@ -8,7 +8,8 @@ export function useGameSound(game,revision){
  useEffect(()=>()=>stopSounds(),[]);
 }
 export default function GameSound({lang}){
- const [on,setOn]=useState(true),[level,setLevel]=useState(22);
+ const [on,setOn]=useState(true),[level,setLevel]=useState(22);const menu=useRef(null);
+ useEffect(()=>{const close=e=>{if(menu.current?.open&&!menu.current.contains(e.target))menu.current.open=false;};const escape=e=>{if(e.key==='Escape'&&menu.current?.open){menu.current.open=false;menu.current.querySelector('summary')?.focus();}};document.addEventListener('pointerdown',close);document.addEventListener('keydown',escape);return()=>{document.removeEventListener('pointerdown',close);document.removeEventListener('keydown',escape);};},[]);
  useEffect(()=>{
   let enabled=true,value=22;try{enabled=localStorage.getItem('flow-sound')!=='off';const raw=localStorage.getItem('flow-sound-volume');if(raw!==null&&Number.isFinite(Number(raw)))value=Math.max(0,Math.min(50,Number(raw)));}catch{}
   setOn(enabled);setLevel(value);configureSound(enabled,value/100);
@@ -21,5 +22,5 @@ export default function GameSound({lang}){
  },[]);
  const th=lang==='th';
  function toggle(){const next=!on;setOn(next);configureSound(next,level/100);try{localStorage.setItem('flow-sound',next?'on':'off');}catch{}if(next){unlockSound();playButtonSound();}}
- return <details style={{position:'relative'}}><summary style={{cursor:'pointer',padding:'10px',whiteSpace:'nowrap'}} aria-label={th?'ตั้งค่าเสียง':'Sound settings'}>{on?'🔊':'🔇'} {th?'เสียง':'Sound'}</summary><div style={{position:'absolute',right:0,top:'100%',zIndex:50,padding:16,width:220,background:'white',border:'1px solid #ddd5ee',borderRadius:16,boxShadow:'0 8px 30px #30204b22'}}><button data-sound-toggle className="btn secondary" aria-pressed={on} onClick={toggle}>{on?(th?'ปิดเสียง':'Mute'):(th?'เปิดเสียง':'Enable sound')}</button><label style={{display:'block',marginTop:12}}>{th?'ระดับเสียง':'Volume'} {level}%<input aria-label={th?'ระดับเสียง':'Volume'} type="range" min="0" max="50" value={level} onChange={e=>{const v=Number(e.target.value);setLevel(v);configureSound(on,v/100);try{localStorage.setItem('flow-sound-volume',String(v));}catch{}}}/></label><small>{th?'เสียงเริ่มทำงานหลังแตะหน้าจอ ไม่เล่นเสียงย้อนหลัง':'Sound starts after interaction. No replay of past events.'}</small></div></details>;
+ return <details ref={menu} className="sound-menu"><summary className="sound-trigger" aria-label={th?'ตั้งค่าเสียง':'Sound settings'}>{on?'🔊':'🔇'} {th?'เสียง':'Sound'}</summary><div className="sound-panel"><button data-sound-toggle className="btn secondary" aria-pressed={on} onClick={toggle}>{on?(th?'ปิดเสียง':'Mute'):(th?'เปิดเสียง':'Enable sound')}</button><label style={{display:'block',marginTop:12}}>{th?'ระดับเสียง':'Volume'} {level}%<input aria-label={th?'ระดับเสียง':'Volume'} type="range" min="0" max="50" value={level} onChange={e=>{const v=Number(e.target.value);setLevel(v);configureSound(on,v/100);try{localStorage.setItem('flow-sound-volume',String(v));}catch{}}}/></label><small>{th?'เสียงเริ่มทำงานหลังแตะหน้าจอ ไม่เล่นเสียงย้อนหลัง':'Sound starts after interaction. No replay of past events.'}</small></div></details>;
 }
