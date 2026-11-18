@@ -7,6 +7,7 @@ import "../components/event-cards.css";
 import "../components/player-identity.css";
 import "../components/room-update.css";
 import "../components/header-layout.css";
+import "../components/atmosphere.css";
 
 export const metadata: Metadata = {
   title: "Flow Club | Play your way to freedom",
