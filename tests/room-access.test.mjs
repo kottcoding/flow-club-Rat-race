@@ -26,13 +26,16 @@ test('API locks every join path, keeps existing seats, enforces creator and full
  try{
   const created=await req('',{type:'create',name:'Owner',title:'PIN test'},key),id=created.room.id;
   assert.equal(created.room.locked,false);
+  assert.equal((await req('',{type:'create',name:'Other',title:'  PIN   TEST  '},other)).error,'ROOM_NAME_TAKEN');
   let d=await req('',{type:'action',room:id,revision:0,action:{type:'roomLock',locked:true,pin:'0123'}},key);assert.equal(d.code,200);assert.equal(d.room.locked,true);assert.equal(d.room.roomLock,undefined);
   const list=await req('',undefined,other);assert.equal(list.rooms.find(r=>r.id===id).locked,true);assert.doesNotMatch(JSON.stringify(list),/0123|hash|salt/);
   assert.equal((await req('',{type:'join',room:id,name:'Guest'},other)).error,'PIN_REQUIRED');
   assert.equal((await req('',{type:'join',room:id,name:'Guest',pin:'9999'},other)).error,'PIN_INCORRECT');
   assert.equal((await req('',{type:'join',room:id,name:'',pin:'0123'},other)).error,'NAME_REQUIRED');
+  assert.equal((await req('',{type:'join',room:id,name:'  OWNER  ',pin:'0123'},other)).error,'NAME_TAKEN');
   d=await req('',{type:'join',room:id,name:'Guest',pin:'0123'},other);assert.equal(d.code,200);assert.equal(d.room.players.length,2);
   const again=await req('',{type:'join',room:id},other);assert.equal(again.code,200);assert.equal(again.room.players.length,2);
+  assert.equal((await req('',{type:'action',room:id,revision:again.revision,action:{type:'appearance',name:' OWNER ',avatarId:0}},other)).error,'NAME_TAKEN');
   assert.equal((await req('',{type:'action',room:id,revision:again.revision,action:{type:'roomLock',locked:false}},other)).error,'CREATOR_ONLY');
   d=await req('',{type:'action',room:id,revision:again.revision,action:{type:'roomLock',locked:false}},key);assert.equal(d.room.locked,false);
   let g=JSON.parse(db.prepare('SELECT state FROM rooms WHERE id=?').get(id).state);g.status='playing';db.prepare('UPDATE rooms SET state=? WHERE id=?').run(JSON.stringify(g),id);
