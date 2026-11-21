@@ -1,4 +1,5 @@
 'use client';
+import {cardIdentity} from '../lib/event-presentation.mjs';
 import NumberInput from './NumberInput';
 import {formatCalculation, formatNumber} from '../lib/number-format.mjs';
 import {WaitingResponses} from './RoomExtras';
@@ -14,7 +15,7 @@ export default function PhotoEvent({g,me,lang,busy,action}){
  const e=g.event,L=(th,en)=>lang==='th'?th:en,T=a=>a?.[lang==='th'?0:1],m=v=>'฿'+new Intl.NumberFormat('en-US',{maximumFractionDigits:2}).format(v||0);
  const mine=g.players[g.turn].id===me.id,done=e.done?.includes(me.id),eligible=me.assets.filter(a=>canSell(g,me,a));
  const Button=({children,onClick,disabled,secondary,...rest})=><button className={'btn '+(secondary?'secondary':'')} disabled={busy||disabled} onClick={onClick} {...rest}>{children}</button>;
- return <div className="photo-event"><h3>{T(e.name)}</h3><CardReference card={e} lang={lang}/>
+ return <div className="photo-event">{cardIdentity(e,lang)&&<div className="formula"><strong>{cardIdentity(e,lang)}</strong></div>}<h3>{T(e.name)}</h3><CardReference card={e} lang={lang}/>
  {e.type==='split'&&e.resolved&&<section className="formula"><strong>{L('ผลการปรับจำนวนหุ้นอัตโนมัติ','Automatic share adjustment')}</strong>{e.splitResults?.length?e.splitResults.map(r=><p key={r.playerId}>{r.name}: {formatNumber(r.before)} × {formatNumber(e.factor)} = <b>{formatNumber(r.after)}</b> {L('หุ้น','shares')}</p>):<p>{L(e.splitResults?'ไม่มีผู้ถือหุ้นชนิดนี้ จึงไม่มีจำนวนหุ้นเปลี่ยนแปลง':'เหตุการณ์นี้ประมวลผลแล้ว ดูรายละเอียดในแท็บการคำนวณ',e.splitResults?'No matching shareholders; no quantities changed.':'Already processed. See Calculations for details.')}</p>}<p>{L('เงินสดไม่เปลี่ยนแปลง · ต้นทุนรวมเดิม · ไม่ปัดเศษจำนวนหุ้น','Cash unchanged · Total cost basis unchanged · Fractional shares retained')}</p></section>}
  {g.phase==='market'&&<>
  <p>{e.scope==='drawer'?L('สิทธิ์เฉพาะผู้เปิดการ์ด','Drawer only'):L('ผู้ถือสินทรัพย์ที่ตรงการ์ดมีสิทธิ์ขาย','Matching asset holders may sell')}</p>
