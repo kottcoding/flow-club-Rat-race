@@ -8,6 +8,7 @@ import "../components/player-identity.css";
 import "../components/room-update.css";
 import "../components/header-layout.css";
 import "../components/atmosphere.css";
+import "../components/master-mode.css";
 
 export const metadata: Metadata = {
   title: "Flow Club | Play your way to freedom",

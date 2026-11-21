@@ -1,0 +1,23 @@
+.teaching-bar{margin:18px auto;padding:16px 22px;width:min(1280px,94%);border:1px solid #cfc6ed;border-radius:18px;background:#f6f2ff;color:#373155}
+.teaching-bar p{margin:10px 0 0;line-height:1.7}.teaching-bar details{margin:0;padding:8px}.master-grant{display:flex;align-items:center;gap:10px;padding:8px}.master-grant input{width:20px;height:20px}.master-watching{font-weight:700;color:#6747a6}
+.master-workspace{position:fixed;inset:0;z-index:150;background:#f5f7ff;display:flex;flex-direction:column;isolation:isolate}
+.master-toolbar{flex:none;padding:12px 18px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:#fff;border-bottom:2px solid #b9a7e6}
+.master-toolbar strong{margin-right:auto}.master-toolbar select{max-width:220px;min-height:44px;border:1px solid #ccc0e5;border-radius:10px;padding:8px;font:inherit}.master-toolbar .btn{min-height:44px;padding:8px 14px}.master-toolbar b{width:100%;color:#b06b0a}
+.master-status{padding:10px 18px;margin:0;background:#eee9fa;line-height:1.6;flex:none}
+.master-scroll{overflow:auto;flex:1;min-height:0;padding:18px;overscroll-behavior:contain}
+.master-canvas{margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(290px,360px);grid-template-areas:'board finance' 'action finance' 'library library';gap:24px;align-items:start;max-width:1400px}
+.master-board{grid-area:board;min-width:0}.master-action{grid-area:action;min-width:0}.master-finance{grid-area:finance;min-width:0}.master-library{grid-area:library;min-width:0}
+.master-canvas.replica{max-width:none;container-type:inline-size}.master-canvas .finance{width:100%;min-width:0}.master-canvas fieldset{border:1px solid #d6cdeb;border-radius:18px;padding:18px;background:white}.master-canvas .btn:disabled{opacity:.85;cursor:default}.master-field-focus{outline:3px solid #b086e8!important;outline-offset:3px}
+.master-canvas .data-library{position:static;width:100%;max-height:none;transform:none}.master-canvas img{max-width:100%}.master-canvas .asset-detail img{width:30px;height:30px}.master-canvas .history{max-height:none}.master-canvas .card-reference img{display:block}
+.master-canvas.adaptive{width:100%}
+@media(max-width:760px){.master-canvas.adaptive{grid-template-columns:minmax(0,1fr);grid-template-areas:'action' 'finance' 'board' 'library'}.master-toolbar{padding:10px;gap:7px}.master-toolbar strong{width:100%}.master-toolbar select{max-width:100%;flex:1}.master-scroll{padding:10px}.master-status{font-size:12px}.teaching-bar{padding:12px}.master-toolbar .btn{font-size:12px}}
+/* The simulated layout follows source width, even on a wider teacher screen. */
+.master-canvas.replica.source-narrow{grid-template-columns:minmax(0,1fr);grid-template-areas:'board' 'action' 'finance' 'library'}
+/* Follow the active panel at a readable width instead of shrinking the whole game. */
+.master-canvas.adaptive[data-follow-section=bank],.master-canvas.adaptive[data-follow-section=statement],.master-canvas.adaptive[data-follow-section=dream]{max-width:780px;grid-template-columns:minmax(0,1fr);grid-template-areas:'finance'}
+.master-canvas.adaptive:is([data-follow-section=bank],[data-follow-section=statement],[data-follow-section=dream])>.master-board,.master-canvas.adaptive:is([data-follow-section=bank],[data-follow-section=statement],[data-follow-section=dream])>.master-action{display:none}
+.master-canvas.adaptive[data-follow-section=bank] .finance>:not(.bank),.master-canvas.adaptive[data-follow-section=statement] .finance>:not(.statement),.master-canvas.adaptive[data-follow-section=dream] .finance>:not(.dream-note){display:none}
+.master-canvas.adaptive[data-follow-section=library]{max-width:1000px;grid-template-columns:minmax(0,1fr);grid-template-areas:'library'}
+.master-canvas.adaptive[data-follow-section=library]>:not(.master-library){display:none}
+.master-canvas.adaptive[data-follow-section=action]{max-width:900px;grid-template-columns:minmax(0,1fr);grid-template-areas:'action' 'board'}
+.master-canvas.adaptive[data-follow-section=action]>.master-finance{display:none}
