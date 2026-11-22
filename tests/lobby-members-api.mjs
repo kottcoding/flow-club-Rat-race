@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 const base=process.env.TEST_URL||'http://127.0.0.1:8788';const tokens=Array.from({length:4},()=>crypto.randomUUID()+crypto.randomUUID());
-async function req(i,body,id){const r=await fetch(base+'/api/game'+(id?'?room='+id:''),{method:body?'POST':'GET',headers:{Authorization:'Bearer '+tokens[i],...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify({...body,clientVersion:3})}:{})});return {status:r.status,...await r.json()};}
+async function req(i,body,id){const r=await fetch(base+'/api/game'+(id?'?room='+id:''),{method:body?'POST':'GET',headers:{Authorization:'Bearer '+tokens[i],...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify({...body,clientVersion:4})}:{})});return {status:r.status,...await r.json()};}
 let d=await req(0,{type:'create',name:'Owner QA',title:'Lobby membership QA'});assert.equal(d.status,200);const id=d.room.id,owner=d.me;
 try{
  d=await req(1,{type:'join',name:'Guest QA',room:id});const guest=d.me;d=await req(2,{type:'join',name:'Third QA',room:id});const third=d.me;

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 const base='http://127.0.0.1:8788',keys=Array.from({length:4},()=>crypto.randomUUID()+crypto.randomUUID());
-async function call(i,body,id){const r=await fetch(base+'/api/game'+(id?'?room='+id:''),{method:body?'POST':'GET',headers:{Authorization:'Bearer '+keys[i],...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify({...body,clientVersion:3})}:{})});return {status:r.status,...await r.json()};}
+async function call(i,body,id){const r=await fetch(base+'/api/game'+(id?'?room='+id:''),{method:body?'POST':'GET',headers:{Authorization:'Bearer '+keys[i],...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify({...body,clientVersion:4})}:{})});return {status:r.status,...await r.json()};}
 let d=await call(0,{type:'create',name:'Host QA',title:'Playing removal API QA'});const id=d.room.id;
 try{
  for(let i=1;i<4;i++)d=await call(i,{type:'join',name:'Guest '+i,room:id});

@@ -22,7 +22,7 @@ test('API permissions, read-only lease, draft relay, revocation and shutdown',as
  async function load(path){const url=new URL(path,import.meta.url);let s=await readFile(url,'utf8');s=s.replace("import {env} from 'cloudflare:workers';","const env=globalThis.__teachingEnv;").replace(/from '(\.\.\/[^']+)'/g,(_,rel)=>"from '"+new URL(rel,url).href+"'");return import('data:text/javascript;base64,'+Buffer.from(s).toString('base64'));}
  const game=await load('../app/api/game/route.js'),teaching=await load('../app/api/teaching/route.js');
  const owner=crypto.randomUUID()+crypto.randomUUID(),guest=crypto.randomUUID()+crypto.randomUUID(),outsider=crypto.randomUUID()+crypto.randomUUID();
- async function req(api,key,body,query=''){const res=await api[body?'POST':'GET'](new Request('https://flow.test/api/'+(api===game?'game':'teaching')+query,{method:body?'POST':'GET',headers:{Origin:'https://flow.test',Authorization:'Bearer '+key,'Content-Type':'application/json'},...(body?{body:JSON.stringify({clientVersion:3,...body})}:{})}));return {code:res.status,...await res.json()};}
+ async function req(api,key,body,query=''){const res=await api[body?'POST':'GET'](new Request('https://flow.test/api/'+(api===game?'game':'teaching')+query,{method:body?'POST':'GET',headers:{Origin:'https://flow.test',Authorization:'Bearer '+key,'Content-Type':'application/json'},...(body?{body:JSON.stringify({clientVersion:4,...body})}:{})}));return {code:res.status,...await res.json()};}
  try{
  let d=await req(game,owner,{type:'create',name:'Teacher',title:'Lesson'}),id=d.room.id,ownerId=d.me;
  let join=await req(game,guest,{type:'join',room:id,name:'Learner'}),guestId=join.me;

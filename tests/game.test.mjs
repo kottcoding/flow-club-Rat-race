@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {room,player,apply,totals,publicRoom} from '../lib/game.mjs';
-function game(){const p=player('A','secret-a'),q=player('B','secret-b');const g=room('TEST','Test',p);g.ruleset='legacy';g.currency='USD';p.dream=0;q.dream=1;g.players.push(q);for(const x of g.players)x.ready=true;apply(g,p.id,{type:'start'},()=>0);return g;}
+function game(){const p=player('A','secret-a'),q=player('B','secret-b');const g=room('TEST','Test',p);delete g.boardVersion;g.ruleset='legacy';g.currency='USD';p.dream=0;q.dream=1;g.players.push(q);for(const x of g.players)x.ready=true;apply(g,p.id,{type:'start'},()=>0);return g;}
 test('starting money, unique professions, private token redaction',()=>{const g=game();assert.equal(g.players[0].cash,totals(g.players[0]).monthly+800);assert.notDeepEqual(g.players[0].profession,g.players[1].profession);assert.equal(publicRoom(g).players[0].key,undefined);});
 test('reject out of turn and duplicate roll',()=>{const g=game();assert.throws(()=>apply(g,g.players[1].id,{type:'roll'}),/NOT_YOUR_TURN/);apply(g,g.players[0].id,{type:'roll'},()=>0);assert.throws(()=>apply(g,g.players[0].id,{type:'roll'}),/ALREADY_ROLLED/);});
 test('loan cost and repayment conserve money',()=>{const g=game(),p=g.players[0],before=p.cash,flow=totals(p).monthly;apply(g,p.id,{type:'loan',amount:3000});assert.equal(p.cash,before+3000);assert.equal(totals(p).monthly,flow-300);apply(g,p.id,{type:'repay',id:'bank',amount:2000});assert.equal(p.loan,1000);assert.equal(p.cash,before+1000);assert.throws(()=>apply(g,p.id,{type:'loan',amount:1500}),/LOAN_MULTIPLE/);});

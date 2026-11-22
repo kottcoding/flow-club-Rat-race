@@ -21,7 +21,7 @@ test('API locks every join path, keeps existing seats, enforces creator and full
  globalThis.__accessTestEnv={DB:{prepare:prepared,async batch(qs){const out=[];for(const q of qs)out.push(await q.run());return out;}}};
  let source=await readFile(new URL('../app/api/game/route.js',import.meta.url),'utf8');source=source.replace("import {env} from 'cloudflare:workers';","const env=globalThis.__accessTestEnv;").replace(/from '(\.\.\/[^']+)'/g,(_,rel)=>"from '"+new URL(rel,new URL('../app/api/game/route.js',import.meta.url)).href+"'");const api=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
  const key=crypto.randomUUID()+crypto.randomUUID(),other=crypto.randomUUID()+crypto.randomUUID();
- async function req(query='',body,auth){const r=await api[body?'POST':'GET'](new Request('https://flow.test/api/game'+query,{method:body?'POST':'GET',headers:{Origin:'https://flow.test',...(auth?{Authorization:'Bearer '+auth}:{}),'Content-Type':'application/json'},...(body?{body:JSON.stringify({...body,clientVersion:3})}:{})}));return {code:r.status,...await r.json()};}
+ async function req(query='',body,auth){const r=await api[body?'POST':'GET'](new Request('https://flow.test/api/game'+query,{method:body?'POST':'GET',headers:{Origin:'https://flow.test',...(auth?{Authorization:'Bearer '+auth}:{}),'Content-Type':'application/json'},...(body?{body:JSON.stringify({...body,clientVersion:4})}:{})}));return {code:r.status,...await r.json()};}
 
  try{
   const created=await req('',{type:'create',name:'Owner',title:'PIN test'},key),id=created.room.id;

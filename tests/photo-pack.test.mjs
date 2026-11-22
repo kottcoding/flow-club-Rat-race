@@ -5,7 +5,7 @@ import {player,room,apply,totals,drawCard,normalizeRoom,publicRoom} from '../lib
 import {PHOTO_PACK_ID,photoProfessions as jobs,photoSmall as small,photoBig as big,photoDoodads as doodads,photoMarkets as markets} from '../lib/photo-pack.mjs';
 import {assetDebt,saleValue,expenseCost,canSell} from '../lib/photo-rules.mjs';
 const decks={small,big,doodad:doodads,market:markets};
-function game(){const p=player('A','secret-a'),q=player('B','secret-b');const g=room('TEST','Photos',p);g.players.push(q);for(const x of g.players)x.ready=true;apply(g,p.id,{type:'start'},()=>0);for(const x of g.players){x.cash=1e8;x.living=1e7;}return g;}
+function game(){const p=player('A','secret-a'),q=player('B','secret-b');const g=room('TEST','Photos',p);delete g.boardVersion;g.players.push(q);for(const x of g.players)x.ready=true;apply(g,p.id,{type:'start'},()=>0);for(const x of g.players){x.cash=1e8;x.living=1e7;}return g;}
 function open(g,deck,index){const p=g.players[g.turn];g.decks[deck]=[index-1];if(['big','small'].includes(deck)){g.phase='choose';apply(g,p.id,{type:'draw',deck});}else{g.phase='roll';p.position=deck==='market'?4:6;apply(g,p.id,{type:'roll'},()=>0);}return g.event;}
 function asset(card,qty=1){return {...structuredClone(card),id:crypto.randomUUID(),qty};}
 test('169 individually traceable cards, counts, bilingual data and original filename mapping',()=>{
