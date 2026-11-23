@@ -1,22 +1,5 @@
-[
-  {
-    "Hash": "BF1775999812F624404765E4E07DB3501A6FDF2A5785CDB73A9B964F744CB44A",
-    "File": "INSTALL-TH.txt"
-  },
-  {
-    "Hash": "0D822576461FFB7FECD37B54CA937927F79A259B34C08DE849ACE5193140FF11",
-    "File": "preview.png"
-  },
-  {
-    "Hash": "3821D2E8BB9940C92FE891F0139C12DABAEC8CF16ACB30B61BFD2D883DBB4B2E",
-    "File": "components\\PhotoBoard.jsx"
-  },
-  {
-    "Hash": "9B6ECDBDC2070C37BDDE45005CADB3447B6AE141C0D6B80D83A430B39CFDF3DB",
-    "File": "lib\\board-display.mjs"
-  },
-  {
-    "Hash": "2FA321521A4D7522C1BF90616FC5419778A455B237D979E9915E5825B5FFFEF9",
-    "File": "public\\flow-garden-board-spacious-v2.svg"
-  }
-]
+{
+  "components/PhotoBoard.jsx": "fcac0f3c9633ca5246ebd725d7ce8e4d0aa5d0c114007db5fc42056dfc989a23",
+  "lib/board-display.mjs": "1990cc071e2929ce408866ec2823bafe39b9493438ab9125c036d66ded3b6558",
+  "public/flow-garden-board-spacious-v2.svg": "2fa321521a4d7522c1bf90616fc5419778a455b237d979e9915e5825b5fffef9"
+}
