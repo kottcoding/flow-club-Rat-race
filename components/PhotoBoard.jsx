@@ -1,5 +1,5 @@
 'use client';
-import {useState,useRef} from 'react';
+import {useState,useRef,useId} from 'react';
 import {photoSpaces,photoInner,innerPhotos} from '../lib/board-20261122.mjs';
 import {boardShortLabels,boardTransitionPath,displayFastPoint as fastPoint,FAST_INNER_RADIUS,FAST_OUTER_RADIUS} from '../lib/board-display.mjs';
 import {PlayerAvatar} from './PlayerAvatar';
@@ -11,6 +11,7 @@ const colors={deal:'#b7d9af',business:'#b7d9af',dream:'#e7bbd2',pay:'#f8d476',ca
 const polar=(r,d)=>[600+r*Math.cos(d*Math.PI/180),500+r*Math.sin(d*Math.PI/180)];
 function wedge(r1,r2,a,b){const c=4,da=c/r2*180/Math.PI,di=c/r1*180/Math.PI;return `M ${polar(r2,a+da)} A ${r2} ${r2} 0 0 1 ${polar(r2,b-da)} Q ${polar(r2,b)} ${polar(r2-c,b)} L ${polar(r1+c,b)} Q ${polar(r1,b)} ${polar(r1,b-di)} A ${r1} ${r1} 0 0 0 ${polar(r1,a+di)} Q ${polar(r1,a)} ${polar(r1+c,a)} L ${polar(r2-c,a)} Q ${polar(r2,a)} ${polar(r2,a+da)} Z`;}
 export default function PhotoBoard({players=[],active,lang='th',preview=false,game,selectedDream,onDream,emojiAuthorization,selfId}){
+ const logoClipId='board-logo-'+useId().replace(/[^a-zA-Z0-9_-]/g,'');
  const [selected,setSelected]=useState(null),[zoom,setZoom]=useState(1);const view=useRef(null),wrap=useRef(null),L=(th,en)=>lang==='th'?th:en,T=a=>a?.[lang==='th'?0:1];
  const space=selected?(selected.track==='fast'?photoSpaces[selected.index]:{name:labels[photoInner[selected.index]],description:details[photoInner[selected.index]]}):null;
  const inspect=(track,index)=>setSelected({track,index});
@@ -26,7 +27,7 @@ export default function PhotoBoard({players=[],active,lang='th',preview=false,ga
  {photoSpaces.map((s,i)=>{const [x,y]=fastPoint(i),chosen=!!s.dream&&s.dream===selectedDream,arc=i>=1&&i<=14,a=40-(i-1)*20;const lines=T(boardShortLabels[i]).split('|'),transition=boardTransitionPath(i);return <g key={i} className="board-space" {...interaction('fast',i)} aria-label={`${i+1}. ${T(s.name)}`}><title>{T(s.name)+(s.cost?' · ฿'+formatNumber(s.cost):'')}</title>{transition?<path d={transition} fill={colors[s.type]} stroke={chosen?'#fff':'#354674'} strokeWidth={chosen?4:2} strokeLinejoin="round"/>:arc?<path d={wedge(FAST_INNER_RADIUS,FAST_OUTER_RADIUS,a-10,a+10)} fill={colors[s.type]} stroke={chosen?'#fff':'#354674'} strokeWidth={chosen?4:2} strokeLinejoin="round"/>:<rect x={x-((i>=25&&i<=37)?1060/24:44)} y={y-45} width={(i>=25&&i<=37)?1060/12:88} height="90" rx="8" fill={colors[s.type]} stroke={chosen?'#fff':'#354674'} strokeWidth={chosen?4:2} strokeLinejoin="round"/>}
  <text x={x} y={y-27} textAnchor="middle" fontSize="10" fill="#554269">{s.type==='dream'?'★ '+s.number:'#'+(i+1)}</text><text textAnchor="middle" fill="#24203d" fontWeight="700" fontSize={lang==='th'?13:11.5}>{lines.map((line,j)=><tspan key={j} x={x} y={y+5+(j-(lines.length-1)/2)*18}>{line}</tspan>)}</text></g>;})}
  {photoInner.map((type,i)=>{const a=142.5+i*15,[x,y]=polar(169,a);return <g key={i} {...interaction('rat',i)} aria-label={`${i+1}. ${T(labels[type])}`}><path d={wedge(122,215,a-7.5,a+7.5)} fill={colors[type]} stroke="#354674" strokeWidth="2"/><text x={x} y={y} transform={`rotate(${Math.cos(a*Math.PI/180)<0?a+180:a} ${x} ${y})`} textAnchor="middle" fontSize="12.5" fontWeight="700" fill="#30243b">{T(labels[type])}</text></g>;})}
- <circle cx="600" cy="500" r="116" fill="#f8f7f0"/><image x="526" y="426" width="148" height="148" href="/flow-club-logo-v1.webp"/>
+ <defs><clipPath id={logoClipId}><circle cx="600" cy="500" r="116"/></clipPath></defs><circle cx="600" cy="500" r="116" fill="#f8f7f0"/><image clipPath={`url(#${logoClipId})`} x="497" y="397" width="206" height="206" href="/flow-club-logo-v1.webp"/>
  <text x="600" y="143" textAnchor="middle" fill="#fff" fontSize="17">FAST TRACK →</text><text x="430" y="770" fill="#fff" fontSize="12">{L('เริ่มวงใน ↗','START ↗')}</text>
  {[...players].sort((a,b)=>Number(a.id===active)-Number(b.id===active)).map(p=>{const [x,y]=p.track==='fast'?fastPoint(p.position):polar(169,142.5+p.position*15);return <g key={p.id} {...interaction(p.track,p.position)} aria-label={p.name}><circle cx={x} cy={y} r="18" fill="transparent"/><foreignObject x={x-18} y={y-18} width="36" height="36" className="board-avatar stacked-avatar"><PlayerAvatar player={p} index={players.indexOf(p)} active={p.id===active} lang={lang}/></foreignObject></g>;})}
  </svg></div>
