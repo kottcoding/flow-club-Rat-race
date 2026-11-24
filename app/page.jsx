@@ -6,7 +6,7 @@ import {hasPhotoBoard} from '../lib/board-20261122.mjs';
 import RoomEmojis from '../components/RoomEmojis';
 import Atmosphere from '../components/Atmosphere';
 import {DeviceBadge,DeviceReporter} from '../components/DeviceBadge';
-import {detectDevice} from '../lib/device.mjs';
+import {detectDeviceReport as detectDevice} from '../lib/device.mjs';
 import MasterMode from '../components/MasterMode';
 import GameSound,{useGameSound} from '../components/GameSound';
 import NumberInput from '../components/NumberInput';
