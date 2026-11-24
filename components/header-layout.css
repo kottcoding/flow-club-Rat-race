@@ -28,3 +28,12 @@
  .top .sound-panel{left:0;right:auto;width:min(300px,88vw)}
 }
 @media(max-width:360px){.top .nav{gap:8px}.top .account-trigger{font-size:12px}.top .account-trigger .player-face{width:28px;height:28px}}
+
+/* Release branding: keep the version visible on small screens and large text settings. */
+.top .wordmark{gap:14px;flex-wrap:nowrap;text-align:left;letter-spacing:normal}
+.top .brand-medallion{display:grid;place-items:center;flex:0 0 auto;width:80px;height:80px;padding:4px;border:1px solid #d8bd7a;border-radius:50%;background:linear-gradient(140deg,#fff9dc,#dfc385 48%,#fff4cd);box-shadow:0 4px 0 #c3a562,0 9px 20px #30245320,inset 0 1px 1px #fff}
+.top .wordmark .app-logo{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.top .brand-lockup{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;min-width:0}
+.top .brand-name{font-size:calc(30px + var(--reading-add,0px));line-height:1.2;letter-spacing:-1px;font-weight:800;color:#302952}
+.top .app-version{display:inline-flex;align-items:center;white-space:nowrap;padding:4px 9px;border:1px solid #d9cba1;border-radius:8px;background:#fff9e9;color:#71542a;font-size:calc(11px + var(--reading-add,0px));font-weight:700;line-height:1.5;letter-spacing:.2px}
+@media(max-width:760px){.top .brand-medallion{width:64px;height:64px}.top .brand-name{font-size:calc(27px + var(--reading-add,0px))}.top .wordmark{gap:12px}.top .brand-lockup{gap:6px 10px}}
