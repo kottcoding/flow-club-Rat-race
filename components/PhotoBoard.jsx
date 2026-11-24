@@ -11,6 +11,18 @@ const details={deal:['เลือกเปิดโอกาสเล็กห�
 const colors={deal:'#b7d9af',business:'#b7d9af',dream:'#e7bbd2',pay:'#f8d476',cashday:'#f8d476',market:'#9fcddd',doodad:'#e6a3b0',baby:'#d3b8e7',charity:'#efc89a',downsize:'#c6bdd6',audit:'#e6a3b0',lawsuit:'#e6a3b0',divorce:'#c6bdd6'};
 const polar=(r,d)=>[600+r*Math.cos(d*Math.PI/180),500+r*Math.sin(d*Math.PI/180)];
 function wedge(r1,r2,a,b){const c=4,da=c/r2*180/Math.PI,di=c/r1*180/Math.PI;return `M ${polar(r2,a+da)} A ${r2} ${r2} 0 0 1 ${polar(r2,b-da)} Q ${polar(r2,b)} ${polar(r2-c,b)} L ${polar(r1+c,b)} Q ${polar(r1,b)} ${polar(r1,b-di)} A ${r1} ${r1} 0 0 0 ${polar(r1,a+di)} Q ${polar(r1,a)} ${polar(r1+c,a)} L ${polar(r2-c,a)} Q ${polar(r2,a)} ${polar(r2,a+da)} Z`;}
+function DreamFrame({index,gradient}){
+ const [x,y]=fastPoint(index),a=40-(index-1)*20;
+ const d=boardTransitionPath(index)||(index>=1&&index<=14?wedge(FAST_INNER_RADIUS,FAST_OUTER_RADIUS,a-10,a+10):null);
+ const width=index>=25&&index<=37?1060/12:88;
+ const shape=props=>d?<path d={d} {...props}/>:<rect x={x-width/2} y={y-45} width={width} height="90" rx="8" {...props}/>;
+ return <g pointerEvents="none" aria-hidden="true" fill="none" strokeLinejoin="round">
+  <g transform="translate(0 3)">{shape({stroke:'#513814',strokeWidth:10,opacity:.8})}</g>
+  {shape({stroke:'#91641c',strokeWidth:10})}
+  {shape({stroke:`url(#${gradient})`,strokeWidth:7})}
+  {shape({stroke:'#fff3ba',strokeWidth:1.2,opacity:.85})}
+ </g>;
+}
 export default function PhotoBoard({players=[],active,lang='th',preview=false,game,selectedDream,onDream,emojiAuthorization,selfId}){
  const tokens=boardTokenLayout(players),seatColors=['#8751d4','#c57b08','#148573','#c44364','#277bb7','#a5449a'];
  const logoClipId='board-logo-'+useId().replace(/[^a-zA-Z0-9_-]/g,'');
@@ -26,8 +38,10 @@ export default function PhotoBoard({players=[],active,lang='th',preview=false,ga
  <image width="1200" height="840" href="/flow-garden-board-spacious-v2.svg" preserveAspectRatio="none" pointerEvents="none"/>
  <path d="M 910 780 H 1130 V 60 H 70 V 780 H 246" fill="none" stroke="#354674" strokeWidth="90" strokeLinejoin="round"/>
 
- {photoSpaces.map((s,i)=>{const [x,y]=fastPoint(i),chosen=!!s.dream&&s.dream===selectedDream,arc=i>=1&&i<=14,a=40-(i-1)*20;const lines=T(boardShortLabels[i]).split('|'),transition=boardTransitionPath(i);return <g key={i} className="board-space" {...interaction('fast',i)} aria-label={`${i+1}. ${T(s.name)}`}><title>{T(s.name)+(s.cost?' · ฿'+formatNumber(s.cost):'')}</title>{transition?<path d={transition} fill={colors[s.type]} stroke={chosen?'#fff':'#354674'} strokeWidth={chosen?4:2} strokeLinejoin="round"/>:arc?<path d={wedge(FAST_INNER_RADIUS,FAST_OUTER_RADIUS,a-10,a+10)} fill={colors[s.type]} stroke={chosen?'#fff':'#354674'} strokeWidth={chosen?4:2} strokeLinejoin="round"/>:<rect x={x-((i>=25&&i<=37)?1060/24:44)} y={y-45} width={(i>=25&&i<=37)?1060/12:88} height="90" rx="8" fill={colors[s.type]} stroke={chosen?'#fff':'#354674'} strokeWidth={chosen?4:2} strokeLinejoin="round"/>}
+ {photoSpaces.map((s,i)=>{const [x,y]=fastPoint(i),chosen=!!s.dream&&s.dream===selectedDream,arc=i>=1&&i<=14,a=40-(i-1)*20;const lines=T(boardShortLabels[i]).split('|'),transition=boardTransitionPath(i);return <g key={i} className="board-space" {...interaction('fast',i)} aria-label={`${i+1}. ${T(s.name)}${chosen?L(' · ความฝันที่เลือก',' · Selected dream'):''}`}><title>{T(s.name)+(s.cost?' · ฿'+formatNumber(s.cost):'')}</title>{transition?<path d={transition} fill={colors[s.type]} stroke="#354674" strokeWidth="2" strokeLinejoin="round"/>:arc?<path d={wedge(FAST_INNER_RADIUS,FAST_OUTER_RADIUS,a-10,a+10)} fill={colors[s.type]} stroke="#354674" strokeWidth="2" strokeLinejoin="round"/>:<rect x={x-((i>=25&&i<=37)?1060/24:44)} y={y-45} width={(i>=25&&i<=37)?1060/12:88} height="90" rx="8" fill={colors[s.type]} stroke="#354674" strokeWidth="2" strokeLinejoin="round"/>}
  <text x={x} y={y-27} textAnchor="middle" fontSize="10" fill="#554269">{s.type==='dream'?'★ '+s.number:'#'+(i+1)}</text><text textAnchor="middle" fill="#24203d" fontWeight="700" fontSize={lang==='th'?13:11.5}>{lines.map((line,j)=><tspan key={j} x={x} y={y+5+(j-(lines.length-1)/2)*18}>{line}</tspan>)}</text></g>;})}
+ <defs><linearGradient id={logoClipId+'-gold'} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#fff5bd"/><stop offset=".22" stopColor="#edbd42"/><stop offset=".45" stopColor="#fff3a6"/><stop offset=".65" stopColor="#c88a19"/><stop offset="1" stopColor="#f7d977"/></linearGradient></defs>
+ {photoSpaces.map((s,i)=>s.dream&&s.dream===selectedDream?<DreamFrame key={'dream-frame-'+i} index={i} gradient={logoClipId+'-gold'}/>:null)}
  {photoInner.map((type,i)=>{const a=142.5+i*15,[x,y]=polar(169,a);return <g key={i} {...interaction('rat',i)} aria-label={`${i+1}. ${T(labels[type])}`}><path d={wedge(122,215,a-7.5,a+7.5)} fill={colors[type]} stroke="#354674" strokeWidth="2"/><text x={x} y={y} transform={`rotate(${Math.cos(a*Math.PI/180)<0?a+180:a} ${x} ${y})`} textAnchor="middle" fontSize="12.5" fontWeight="700" fill="#30243b">{T(labels[type])}</text></g>;})}
  <defs><clipPath id={logoClipId}><circle cx="600" cy="500" r="116"/></clipPath></defs><circle cx="600" cy="500" r="116" fill="#f8f7f0"/><image clipPath={`url(#${logoClipId})`} x="497" y="397" width="206" height="206" href="/flow-club-logo-v1.webp"/>
  <text x="600" y="143" textAnchor="middle" fill="#fff" fontSize="17">FAST TRACK →</text><text x="430" y="770" fill="#fff" fontSize="12">{L('เริ่มวงใน ↗','START ↗')}</text>
